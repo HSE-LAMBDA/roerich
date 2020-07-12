@@ -1,0 +1,3 @@
+[submodule "datasets"]
+	path = datasets
+	url = git@gitlab.com:lambda-hse/change-point/datasets.git
