@@ -3,14 +3,15 @@ from collections import defaultdict
 
 import numpy as np
 import torch
+from scipy import interpolate
 
-from algorithms import autoregression_matrix
-from algorithms import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
+from metrics import autoregression_matrix
+from metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 
 
 class ChangePointDetection(metaclass=ABCMeta):
     def __init__(self, net, metric, window_size, periods, lag_size,
-                 step, n_epochs, scaler, lr, lam, optimizer, debug):
+                 step, n_epochs, scaler, lr, lam, optimizer, shift=False, unify=False, debug=0):
         self.net = net
         self.metric = metric
         self.window_size = window_size
@@ -23,6 +24,10 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.lam = lam
         self.optimizer = optimizer
         self.debug = debug
+        
+        self.shift = shift
+        self._time_shift = lag_size + window_size
+        self.unify = unify
         
         self.optimizers = defaultdict(lambda: torch.optim.Adam)
         
@@ -47,8 +52,18 @@ class ChangePointDetection(metaclass=ABCMeta):
             X, y = self.preprocess(reference[i], test[i])
             score = self.reference_test_predict(X, y)
             scores.append(score)
-        T_scores = [T[i] for i in range(len(reference))]
-        return np.array(T_scores), np.array(scores)
+        T_scores = np.array([T[i] for i in range(len(reference))])
+        scores = np.array(scores)
+        
+        if self.unify and self.shift:
+            T_scores = T_scores - self._time_shift
+            return T, self.unified_score(T, T_scores, scores)
+        elif self.unify:
+            return T, self.unified_score(T, T_scores, scores)
+        elif self.shift:
+            return T_scores - self._time_shift, scores
+        else:
+            return T_scores, scores
 
     def reference_test(self, X):
         N = self.lag_size
@@ -73,6 +88,11 @@ class ChangePointDetection(metaclass=ABCMeta):
         X = torch.from_numpy(X).float()
         y = torch.from_numpy(y).float()
         return X, y
+
+    def unified_score(self, T, T_score, score):
+        inter = interpolate.interp1d(T_score, score, kind='previous', fill_value=(0, 0), bounds_error=False)
+        uni_score = inter(T)
+        return uni_score
     
     @abstractmethod
     def reference_test_predict(self, X_ref, X_test):
@@ -80,5 +100,4 @@ class ChangePointDetection(metaclass=ABCMeta):
 
 
 if __name__ == '__main__':
-    c = ChangePointDetectionOnline()
-    
+    pass
