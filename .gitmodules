@@ -1,3 +1,6 @@
 [submodule "datasets"]
 	path = datasets
 	url = git@gitlab.com:lambda-hse/change-point/datasets.git
+[submodule "roerich_demo"]
+	path = roerich_demo
+	url = git@gitlab.com:lambda-hse/change-point/roerich_demo.git
