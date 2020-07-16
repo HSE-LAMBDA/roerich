@@ -4,6 +4,7 @@ from collections import defaultdict
 import numpy as np
 import torch
 from scipy import interpolate
+from scipy.signal import find_peaks_cwt
 
 from metrics import autoregression_matrix
 from metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
@@ -93,6 +94,11 @@ class ChangePointDetection(metaclass=ABCMeta):
         inter = interpolate.interp1d(T_score, score, kind='previous', fill_value=(0, 0), bounds_error=False)
         uni_score = inter(T)
         return uni_score
+    
+    def find_peaks(self, vector, *args, **kwargs):
+        peaks = find_peaks_cwt(vector, *args, **kwargs)
+        
+        return peaks
     
     @abstractmethod
     def reference_test_predict(self, X_ref, X_test):
