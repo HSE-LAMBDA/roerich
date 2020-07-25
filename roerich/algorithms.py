@@ -3,7 +3,7 @@ from copy import deepcopy
 import numpy as np
 import torch.nn as nn
 
-from cpd import ChangePointDetection
+from .cpd import ChangePointDetection
 
 
 class ChangePointDetectionOnlineCLF(ChangePointDetection):
@@ -38,7 +38,7 @@ class ChangePointDetectionOnlineCLF(ChangePointDetection):
         return score
 
 
-class ChangePointDetectionOnlineRulsif(ChangePointDetection):
+class ChangePointDetectionOnlineRuLSIF(ChangePointDetection):
     
     def __init__(self, alpha, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,14 +58,13 @@ class ChangePointDetectionOnlineRulsif(ChangePointDetection):
             lr=self.lr,
             weight_decay=self.lam
         )
-        
-    def compute_loss(self, y_pred_batch_ref, y_pred_batch_test):
     
+    def compute_loss(self, y_pred_batch_ref, y_pred_batch_test):
         loss = 0.5 * (1 - self.alpha) * (y_pred_batch_ref ** 2).mean() + \
                0.5 * self.alpha * (y_pred_batch_test ** 2).mean() - (y_pred_batch_test).mean()
         
         return loss
-        
+    
     def reference_test_predict(self, X, y):
         n_last = min(self.window_size, self.step)
         self.net1.train(False)

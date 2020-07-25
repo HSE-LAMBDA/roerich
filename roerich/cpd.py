@@ -6,8 +6,8 @@ import torch
 from scipy import interpolate
 from scipy.signal import find_peaks_cwt
 
-from metrics import autoregression_matrix
-from metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
+from .metrics import autoregression_matrix
+from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 
 
 class ChangePointDetection(metaclass=ABCMeta):
