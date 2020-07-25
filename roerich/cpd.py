@@ -8,27 +8,35 @@ from scipy.signal import find_peaks_cwt
 
 from .metrics import autoregression_matrix
 from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
+from .net import MyNN
+from .scaler import SmaScalerCache
 
 
 class ChangePointDetection(metaclass=ABCMeta):
-    def __init__(self, net, metric, window_size, periods, lag_size,
-                 step, n_epochs, scaler, lr, lam, optimizer, shift=False, unify=False, debug=0):
-        self.net = net
+    def __init__(self, n_inputs, net="default", scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
+                 step=1, n_epochs=100, lr=0.01, lam=0, optimizer="Adam", debug=0,
+                 nn_hidden=50, dropout=0,
+                 shift=False, unify=False, average=False, avg_window=1):
+    
+        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
+        self.scaler = SmaScalerCache(window_size+lag_size) if scaler == "default" else scaler
+        
         self.metric = metric
         self.window_size = window_size
         self.periods = periods
         self.lag_size = lag_size
         self.step = step
         self.n_epochs = n_epochs
-        self.scaler = scaler
         self.lr = lr
         self.lam = lam
         self.optimizer = optimizer
         self.debug = debug
         
         self.shift = shift
-        self._time_shift = lag_size + window_size
         self.unify = unify
+        self.average = average
+        self.avg_window = avg_window
+        self._time_shift = lag_size + window_size
         
         self.optimizers = defaultdict(lambda: torch.optim.Adam)
         

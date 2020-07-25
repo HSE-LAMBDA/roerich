@@ -6,7 +6,7 @@ import torch.nn as nn
 from .cpd import ChangePointDetection
 
 
-class ChangePointDetectionOnlineCLF(ChangePointDetection):
+class CLF(ChangePointDetection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.criterion = nn.BCELoss()
@@ -38,7 +38,7 @@ class ChangePointDetectionOnlineCLF(ChangePointDetection):
         return score
 
 
-class ChangePointDetectionOnlineRuLSIF(ChangePointDetection):
+class RuLSIF(ChangePointDetection):
     
     def __init__(self, alpha, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,5 +1,5 @@
-from .algorithms import ChangePointDetectionOnlineCLF, ChangePointDetectionOnlineRuLSIF
+from .algorithms import CLF, RuLSIF
 
 __all__ = [
-    'ChangePointDetectionOnlineCLF', 'ChangePointDetectionOnlineRuLSIF'
+    'CLF', 'RuLSIF'
 ]
