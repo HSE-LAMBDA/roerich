@@ -76,7 +76,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         T_uni = np.arange(len(X))
         if self.unify and self.shift:
             T_scores = T_scores - self._time_shift
-            res = [T_uni - self._time_shift, self.unified_score(T_uni, T_scores, scores)]
+            res = [T_uni, self.unified_score(T_uni, T_scores, scores)]
         elif self.unify:
             res = [T_uni, self.unified_score(T_uni, T_scores, scores)]
         elif self.shift:
