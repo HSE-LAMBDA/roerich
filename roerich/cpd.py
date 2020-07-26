@@ -11,6 +11,7 @@ from .metrics import autoregression_matrix
 from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 from .net import MyNN
 from .scaler import SmaScalerCache
+from .helper import SMA
 
 
 class ChangePointDetection(metaclass=ABCMeta):
@@ -72,7 +73,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         
         res = []
         
-        # todo fix
+        # todo optimize memory
         T_uni = np.arange(len(X))
         if self.unify and self.shift:
             T_scores = T_scores - self._time_shift
@@ -83,6 +84,9 @@ class ChangePointDetection(metaclass=ABCMeta):
             res = [T_scores - self._time_shift, scores]
         else:
             res = [T_scores, scores]
+        
+        if self.average:
+            res[1] = SMA(res[1], self.avg_window)
         
         if self.find_peaks:
             res.append(self.find_peaks_cwt(res[-1], widths=self.peak_widths))
