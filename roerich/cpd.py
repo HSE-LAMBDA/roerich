@@ -64,8 +64,8 @@ class ChangePointDetection(metaclass=ABCMeta):
         T, reference, test = self.reference_test(X_auto)
         scores = []
         for i in range(len(reference)):
-            X, y = self.preprocess(reference[i], test[i])
-            score = self.reference_test_predict(X, y)
+            X_, y_ = self.preprocess(reference[i], test[i])
+            score = self.reference_test_predict(X_, y_)
             scores.append(score)
         T_scores = np.array([T[i] for i in range(len(reference))])
         scores = np.array(scores)
