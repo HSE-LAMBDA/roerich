@@ -15,11 +15,11 @@ from .scaler import SmaScalerCache
 class ChangePointDetection(metaclass=ABCMeta):
     def __init__(self, n_inputs, net="default", scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
                  step=1, n_epochs=100, lr=0.01, lam=0, optimizer="Adam", debug=0,
-                 nn_hidden=50, dropout=0,
+                 nn_hidden=50, dropout=0, find_peaks=False, peak_widths=[50], plot_peak_height=10,
                  shift=False, unify=False, average=False, avg_window=1):
-    
+        
         self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
-        self.scaler = SmaScalerCache(window_size+lag_size) if scaler == "default" else scaler
+        self.scaler = SmaScalerCache(window_size + lag_size) if scaler == "default" else scaler
         
         self.metric = metric
         self.window_size = window_size
@@ -34,9 +34,14 @@ class ChangePointDetection(metaclass=ABCMeta):
         
         self.shift = shift
         self.unify = unify
+        self._time_shift = lag_size + window_size
+
+        self.find_peaks = find_peaks
+        self.peak_widths = peak_widths
+        self.plot_peak_height = plot_peak_height
+        
         self.average = average
         self.avg_window = avg_window
-        self._time_shift = lag_size + window_size
         
         self.optimizers = defaultdict(lambda: torch.optim.Adam)
         
@@ -52,7 +57,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.metric_func["PE"] = PE
         self.metric_func["PE_sym"] = PE_sym
         self.metric_func["W"] = Wasserstein
-        
+    
     def predict(self, X):
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
         T, reference, test = self.reference_test(X_auto)
@@ -64,26 +69,33 @@ class ChangePointDetection(metaclass=ABCMeta):
         T_scores = np.array([T[i] for i in range(len(reference))])
         scores = np.array(scores)
         
+        res = []
+        
         if self.unify and self.shift:
             T_scores = T_scores - self._time_shift
-            return T, self.unified_score(T, T_scores, scores)
+            res = [T - self._time_shift, self.unified_score(T, T_scores, scores)]
         elif self.unify:
-            return T, self.unified_score(T, T_scores, scores)
+            res = [T, self.unified_score(T, T_scores, scores)]
         elif self.shift:
-            return T_scores - self._time_shift, scores
+            res = [T_scores - self._time_shift, scores]
         else:
-            return T_scores, scores
-
+            res = [T_scores, scores]
+        
+        if self.find_peaks:
+            res.append(self.find_peaks_cwt(res[-1], widths=self.peak_widths))
+        
+        return res
+    
     def reference_test(self, X):
         N = self.lag_size
         ws = self.window_size
         T = []
         reference = []
         test = []
-        for i in range(2*ws+N-1, len(X), self.step):
+        for i in range(2 * ws + N - 1, len(X), self.step):
             T.append(i)
-            reference.append(X[i-2*ws-N+1:i-ws-N+1])
-            test.append(X[i-ws+1:i+1])
+            reference.append(X[i - 2 * ws - N + 1:i - ws - N + 1])
+            test.append(X[i - ws + 1:i + 1])
         return np.array(T), np.array(reference), np.array(test)
     
     def preprocess(self, X_ref, X_test):
@@ -91,19 +103,19 @@ class ChangePointDetection(metaclass=ABCMeta):
         y_test = np.ones(len(X_test))
         X = np.vstack((X_ref, X_test))
         y = np.hstack((y_ref, y_test))
-    
+        
         X = self.scaler.fit_transform(X)
-    
+        
         X = torch.from_numpy(X).float()
         y = torch.from_numpy(y).float()
         return X, y
-
+    
     def unified_score(self, T, T_score, score):
         inter = interpolate.interp1d(T_score, score, kind='previous', fill_value=(0, 0), bounds_error=False)
         uni_score = inter(T)
         return uni_score
     
-    def find_peaks(self, vector, *args, **kwargs):
+    def find_peaks_cwt(self, vector, *args, **kwargs):
         peaks = find_peaks_cwt(vector, *args, **kwargs)
         
         return peaks
