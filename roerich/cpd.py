@@ -156,7 +156,7 @@ class ChangePointDetection(metaclass=ABCMeta):
             plt.plot([t]*2, [-1, s_max], color='0', linestyle='--')
         
         # display find peaks #todo refactoring
-        if peaks:
+        if peaks is not None:
             plt.subplot(n, 1, n)
             new_score_peaks = np.zeros(len(T))
             new_score_peaks[peaks] = self.plot_peak_height
