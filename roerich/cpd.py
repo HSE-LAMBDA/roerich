@@ -143,7 +143,7 @@ class ChangePointDetection(metaclass=ABCMeta):
             plt.legend(loc='upper left', fontsize=16)
             plt.tight_layout()
     
-        score_plot_ix = n - 1 if peaks else n
+        score_plot_ix = n if peaks is None else n - 1
         plt.subplot(n, 1, score_plot_ix)
         plt.plot(Ts, S, linewidth=3, label="Change-point score", color='C3')
         for t in T[L == 1]:
