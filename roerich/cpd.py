@@ -152,7 +152,9 @@ class ChangePointDetection(metaclass=ABCMeta):
         # display find peaks #todo refactoring
         if peaks:
             plt.subplot(n, 1, n)
-            plt.plot(peaks, S, linewidth=3, label="Peaks", color='C4')
+            new_score_peaks = np.zeros(len(T))
+            new_score_peaks[peaks] = self.plot_peak_height
+            plt.plot(new_score_peaks, S, linewidth=3, label="Peaks", color='C4')
             for t in T[L == 1]:
                 plt.plot([t]*2, [-1, s_max], color='0', linestyle='--')
         
