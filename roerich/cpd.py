@@ -159,7 +159,7 @@ class ChangePointDetection(metaclass=ABCMeta):
             plt.subplot(n, 1, n)
             new_score_peaks = np.zeros(len(T))
             new_score_peaks[peaks] = plot_peak_height
-            plt.plot(new_score_peaks, S, linewidth=3, label="Peaks", color='C4')
+            plt.plot(new_score_peaks, linewidth=3, label="Peaks", color='C4')
             for t in T[L == 1]:
                 plt.plot([t]*2, [-1, s_max], color='0', linestyle='--')
         
