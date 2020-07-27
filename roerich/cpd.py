@@ -17,7 +17,7 @@ from .helper import SMA
 class ChangePointDetection(metaclass=ABCMeta):
     def __init__(self, n_inputs, net="default", scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
                  step=1, n_epochs=100, lr=0.01, lam=0, optimizer="Adam", debug=0,
-                 nn_hidden=50, dropout=0, find_peaks=False, peak_widths=[50], plot_peak_height=10,
+                 nn_hidden=50, dropout=0, find_peaks=False, peak_widths=[50],
                  shift=False, unify=False, average=False, avg_window=1):
         
         self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
@@ -40,7 +40,6 @@ class ChangePointDetection(metaclass=ABCMeta):
 
         self.find_peaks = find_peaks
         self.peak_widths = peak_widths
-        self.plot_peak_height = plot_peak_height
         
         self.average = average
         self.avg_window = avg_window
@@ -130,7 +129,7 @@ class ChangePointDetection(metaclass=ABCMeta):
     def reference_test_predict(self, X_ref, X_test):
         pass
     
-    def display(self, X, T, L, S, Ts, peaks=None, s_max=10):
+    def display(self, X, T, L, S, Ts, peaks=None, plot_peak_height=10, s_max=10):
         n = X.shape[1] + 1 if peaks is None else X.shape[1] + 2
     
         plt.figure(figsize=(12, n*2.5+0.25))
@@ -159,7 +158,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         if peaks is not None:
             plt.subplot(n, 1, n)
             new_score_peaks = np.zeros(len(T))
-            new_score_peaks[peaks] = self.plot_peak_height
+            new_score_peaks[peaks] = plot_peak_height
             plt.plot(new_score_peaks, S, linewidth=3, label="Peaks", color='C4')
             for t in T[L == 1]:
                 plt.plot([t]*2, [-1, s_max], color='0', linestyle='--')
