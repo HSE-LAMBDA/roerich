@@ -26,6 +26,6 @@ T_score, score, peaks = cpd.predict(X)
 
 For data visualization use: 
 ```python
-cpd.display(X, T, label, score, T, peaks)
+roerich.display(X, T, label, score, T, peaks)
 ```
 ![](images/demo.png)
