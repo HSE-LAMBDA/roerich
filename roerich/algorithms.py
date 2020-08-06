@@ -4,10 +4,12 @@ import numpy as np
 import torch.nn as nn
 
 from .cpd import ChangePointDetection
+from .net import MyNN, MyNNRegressor
 
 
 class CLF(ChangePointDetection):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, n_inputs=10, net="default",
+                 nn_hidden=50, dropout=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.criterion = nn.BCELoss()
         
@@ -16,8 +18,11 @@ class CLF(ChangePointDetection):
             lr=self.lr,
             weight_decay=self.lam
         )  # todo ASGD
-    
-    def reference_test_predict(self, X, y):
+
+        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
+
+
+def reference_test_predict(self, X, y):
         self.net.train(False)
         n_last = min(self.window_size, self.step)
         ref_preds = self.net(X[y == 0][-n_last:]).detach().numpy()
@@ -40,12 +45,13 @@ class CLF(ChangePointDetection):
 
 class RuLSIF(ChangePointDetection):
     
-    def __init__(self, alpha, *args, **kwargs):
+    def __init__(self, alpha, n_inputs=10, net="default",
+                 nn_hidden=50, dropout=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.alpha = alpha
-        self.net1 = self.net
-        self.net2 = deepcopy(self.net)
+        self.net1 = MyNNRegressor(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
+        self.net2 = deepcopy(self.net1)
         
         self.opt1 = self.optimizers[kwargs["optimizer"]](
             self.net1.parameters(),

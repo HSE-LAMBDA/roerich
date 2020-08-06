@@ -9,18 +9,16 @@ from scipy.signal import find_peaks_cwt
 
 from .metrics import autoregression_matrix
 from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
-from .net import MyNN
 from .scaler import SmaScalerCache
 from .helper import SMA
 
 
 class ChangePointDetection(metaclass=ABCMeta):
-    def __init__(self, n_inputs, net="default", scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
+    def __init__(self, scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
                  step=1, n_epochs=100, lr=0.01, lam=0, optimizer="Adam", debug=0,
-                 nn_hidden=50, dropout=0, find_peaks=False, peak_widths=[50],
+                 find_peaks=False, peak_widths=[50],
                  shift=False, unify=False, average=False, avg_window=1):
         
-        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
         self.scaler = SmaScalerCache(window_size + lag_size) if scaler == "default" else scaler
         
         self.metric = metric
