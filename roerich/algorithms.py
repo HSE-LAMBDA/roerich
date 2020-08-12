@@ -69,7 +69,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         T_scores = T_scores - self._time_shift
         unified_score = self.unified_score(T_uni, T_scores, scores)
         avg_unified_score = SMA(unified_score, self.avg_window)
-        peaks = res.append(self.find_peaks_cwt(avg_unified_score, widths=self.peak_widths))
+        peaks = self.find_peaks_cwt(avg_unified_score, widths=self.peak_widths)
         
         return avg_unified_score, peaks
     
