@@ -34,7 +34,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         
         self._time_shift = lag_size + window_size
         self.avg_window = lag_size + window_size
-        self.peak_widths = 0.25 * (lag_size + window_size)
+        self.peak_widths = lag_size + window_size
         
         self.optimizers = defaultdict(lambda: torch.optim.Adam)
         
