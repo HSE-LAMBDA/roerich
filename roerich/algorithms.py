@@ -115,14 +115,13 @@ class OnlineNNClassifier(ChangePointDetection):
     def __init__(self, net="default", n_inputs=1, nn_hidden=50, dropout=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.criterion = nn.BCELoss()
-        
+
+        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
         self.opt = self.optimizers[kwargs["optimizer"]](
             self.net.parameters(),
             lr=self.lr,
             weight_decay=self.lam
         )  # todo ASGD
-        
-        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
 
     def reference_test_predict(self, X, y):
         self.net.train(False)
