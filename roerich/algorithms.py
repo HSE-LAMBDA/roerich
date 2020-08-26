@@ -56,7 +56,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         pass
     
     def predict(self, X):
-        self.init_net()
+        self.init_net(X.shape[1])
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
         T, reference, test = self.reference_test(X_auto)
         scores = []
