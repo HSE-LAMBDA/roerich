@@ -7,7 +7,7 @@ Make sure that your data has a shape `(seq_len, n_dims)` or you can generate syn
 import numpy as np
 import roerich
  
-X = roerich.generate_dataset(period=2000, N_tot=20000)
+X, label = roerich.generate_dataset(period=2000, N_tot=20000)
 T = np.arange(len(X))
 ```
 
