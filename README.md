@@ -14,9 +14,9 @@ T = np.arange(len(X))
 You can use two algorithms: `CLF` or `RuLSIF`: 
 
 ```python
-cpd = roerich.OnlineNNClassifier(net='default', scaler="default", n_inputs=X.shape[1], metric="KL_sym",
-                  periods=1, window_size=10, lag_size=500, step=10, n_epochs=100, lr=0.1,
-                  lam=0.0001, optimizer="Adam"
+cpd = roerich.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
+                  periods=1, window_size=10, lag_size=500, step=10, n_epochs=100,
+                  lr=0.1, lam=0.0001, optimizer="Adam"
                  )
 
 # Detect change points
