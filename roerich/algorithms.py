@@ -29,7 +29,6 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.n_epochs = n_epochs
         self.lr = lr
         self.lam = lam
-        self.optimizer = optimizer
         self.debug = debug
         
         self._time_shift = lag_size + window_size
@@ -42,16 +41,22 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.optimizers["SGD"] = torch.optim.SGD
         self.optimizers["RMSprop"] = torch.optim.RMSprop
         self.optimizers["ASGD"] = torch.optim.ASGD
-        
-        self.metric_func = defaultdict(int)
-        self.metric_func["KL_sym"] = KL_sym
-        self.metric_func["KL"] = KL
-        self.metric_func["JSD"] = JSD
-        self.metric_func["PE"] = PE
-        self.metric_func["PE_sym"] = PE_sym
-        self.metric_func["W"] = Wasserstein
+        self.optimizer = self.optimizers[optimizer]
+
+        self.metric_func = {"KL_sym": KL_sym,
+                            "KL": KL,
+                            "JSD": JSD,
+                            "PE": PE,
+                            "PE_sym": PE_sym,
+                            "W": Wasserstein
+                            }
+
+    @abstractmethod
+    def init_net(self, n_inputs):
+        pass
     
     def predict(self, X):
+        self.init_net()
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
         T, reference, test = self.reference_test(X_auto)
         scores = []
@@ -110,17 +115,22 @@ class ChangePointDetection(metaclass=ABCMeta):
 
 
 class OnlineNNClassifier(ChangePointDetection):
-    def __init__(self, net="default", n_inputs=1, nn_hidden=50, dropout=0, *args, **kwargs):
+    def __init__(self, net="default", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.criterion = nn.BCELoss()
-
-        self.net = MyNN(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
-        self.opt = self.optimizers[kwargs["optimizer"]](
+        
+        self.base_net = MyNN if net == "default" else net
+        self.net = None
+        self.opt = None
+    
+    def init_net(self, n_inputs):
+        self.net = self.base_net(n_inputs)
+        self.opt = self.optimizer(
             self.net.parameters(),
             lr=self.lr,
             weight_decay=self.lam
-        )  # todo ASGD
-
+        )
+    
     def reference_test_predict(self, X, y):
         self.net.train(False)
         n_last = min(self.window_size, self.step)
@@ -144,25 +154,25 @@ class OnlineNNClassifier(ChangePointDetection):
 
 class OnlineNNRuLSIF(ChangePointDetection):
     
-    def __init__(self, alpha, n_inputs=10, net="default",
-                 nn_hidden=50, dropout=0, *args, **kwargs):
+    def __init__(self, alpha, net="default", *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         self.alpha = alpha
-        self.net1 = MyNNRegressor(n_inputs=n_inputs, n_hidden=nn_hidden, dropout=dropout) if net == "default" else net
-        self.net2 = deepcopy(self.net1)
-        
-        self.opt1 = self.optimizers[kwargs["optimizer"]](
+        self.base_net = MyNNRegressor if net == "default" else net
+        self.net1 = None
+        self.net2 = None
+        self.opt1 = None
+        self.opt2 = None
+
+    def init_net(self, n_inputs):
+        self.net1 = self.base_net(n_inputs)
+        self.opt1 = self.optimizer(
             self.net1.parameters(),
             lr=self.lr,
             weight_decay=self.lam
-        )  # todo ASGD
-        
-        self.opt2 = self.optimizers[kwargs["optimizer"]](
-            self.net2.parameters(),
-            lr=self.lr,
-            weight_decay=self.lam
         )
+        self.net2 = deepcopy(self.net1)
+        self.opt2 = deepcopy(self.opt1)
     
     def compute_loss(self, y_pred_batch_ref, y_pred_batch_test):
         loss = 0.5 * (1 - self.alpha) * (y_pred_batch_ref ** 2).mean() + \
