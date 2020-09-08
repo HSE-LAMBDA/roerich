@@ -15,7 +15,7 @@ You can use two algorithms: `CLF` or `RuLSIF`:
 
 ```python
 cpd = roerich.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
-                  periods=1, window_size=10, lag_size=500, step=10, n_epochs=100,
+                  periods=1, window_size=10, lag_size=500, step=10, n_epochs=1,
                   lr=0.1, lam=0.0001, optimizer="Adam"
                  )
 
