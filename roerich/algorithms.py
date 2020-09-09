@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
 from copy import deepcopy
+from typing import Union, Type, Any, Tuple
 
 import numpy as np
 import torch
@@ -16,8 +17,25 @@ from .helper import SMA
 
 
 class ChangePointDetection(metaclass=ABCMeta):
-    def __init__(self, scaler="default", metric="KL", window_size=1, periods=10, lag_size=0,
-                 step=1, n_epochs=100, lr=0.01, lam=0, optimizer="Adam", debug=0):
+    def __init__(self, scaler: Any = "default", metric: str = "KL", window_size: int = 1, periods: int = 10,
+                 lag_size: int = 0, step: int = 1, n_epochs: int = 100, lr: float = 0.01, lam: float = 0,
+                 optimizer: str = "Adam", debug: int = 0):
+        """
+        
+        Parameters
+        ----------
+        scaler: A scaler object is used to scale an input data. The default one is `SmaScalerCache`
+        metric: A loss function during optimize step of NN. Can be one of the following KL_sym, KL, JSD, PE, PE_sym, Wasserstein
+        window_size: A size of a window when splitting input data into train and test arrays
+        periods: A number of previous data-points used when constructing autoregressive matrix
+        lag_size: A distance between train- and test- windows
+        step: Each `step`-th data-point is used when creating the input dataset
+        n_epochs: A number of epochs during training NN
+        lr: A learning rate at each step of optimizer
+        lam: A regularization rate
+        optimizer: One of Adam, SGD, RMSprop or ASGD optimizers
+        debug: default zero
+        """
         
         self.scaler = SmaScalerCache(window_size + lag_size) if scaler == "default" else scaler
         
@@ -42,7 +60,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.optimizers["RMSprop"] = torch.optim.RMSprop
         self.optimizers["ASGD"] = torch.optim.ASGD
         self.optimizer = self.optimizers[optimizer]
-
+        
         self.metric_func = {"KL_sym": KL_sym,
                             "KL": KL,
                             "JSD": JSD,
@@ -50,12 +68,31 @@ class ChangePointDetection(metaclass=ABCMeta):
                             "PE_sym": PE_sym,
                             "W": Wasserstein
                             }
-
+    
     @abstractmethod
-    def init_net(self, n_inputs):
+    def init_net(self, n_inputs: int) -> None:
+        """
+        Initialize neural network based on `self.base_net` class
+        Parameters
+        ----------
+        n_inputs: Number of inputs of neural network
+        -------
+
+        """
         pass
     
-    def predict(self, X):
+    def predict(self, X: Union[np.ndarray, torch.Tensor]) -> Tuple[Any, Any]:
+        """
+        Determines a CPD score for every data-point
+        Parameters
+        ----------
+        X: An input data
+
+        Returns `avg_unified_score`: An averaged, unified and shifted CPD score for every data-point in X
+                `peaks` Locations of CPD points along all data-points
+        -------
+
+        """
         self.init_net(X.shape[1])
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
         T, reference, test = self.reference_test(X_auto)
@@ -76,7 +113,18 @@ class ChangePointDetection(metaclass=ABCMeta):
         
         return avg_unified_score, peaks
     
-    def reference_test(self, X):
+    def reference_test(self, X: Union[torch.Tensor, np.ndarray]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Creates reference and test datasets based on autoregressive matrix.
+        
+        Parameters
+        ----------
+        X: An autoregressive matrix
+
+        Returns tuple of numpy arrays: time-steps, reference and test datasets
+        -------
+
+        """
         N = self.lag_size
         ws = self.window_size
         T = []
@@ -88,7 +136,22 @@ class ChangePointDetection(metaclass=ABCMeta):
             test.append(X[i - ws + 1:i + 1])
         return np.array(T), np.array(reference), np.array(test)
     
-    def preprocess(self, X_ref, X_test):
+    def preprocess(self, X_ref: np.ndarray, X_test: np.ndarray) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Creates X and y datasets for training NN by stacking reference and test datasets.
+        Also applies a scaling transformation into resulting X dataset.
+        Labels for reference data-points is 1s.
+        Labels for test data-points is 0s.
+        
+        Parameters
+        ----------
+        X_ref: reference data-points
+        X_test: test data-points
+
+        Returns
+        -------
+        Tuple of training data
+        """
         y_ref = np.zeros(len(X_ref))
         y_test = np.ones(len(X_test))
         X = np.vstack((X_ref, X_test))
@@ -100,22 +163,64 @@ class ChangePointDetection(metaclass=ABCMeta):
         y = torch.from_numpy(y).float()
         return X, y
     
-    def unified_score(self, T, T_score, score):
+    def unified_score(self, T: np.ndarray, T_score: np.ndarray, score: np.ndarray) -> np.ndarray:
+        """
+        Interpolates a CPD score of T_score interval onto T interval
+        Parameters
+        ----------
+        T: A broader time-step interval
+        T_score: A time intervals of CPD scores
+        score: A CPD scores
+
+        Returns
+        -------
+        Interpolated CPD scores
+        """
         inter = interpolate.interp1d(T_score, score, kind='previous', fill_value=(0, 0), bounds_error=False)
         uni_score = inter(T)
         return uni_score
     
     def find_peaks_cwt(self, vector, *args, **kwargs):
+        """
+        Find peaks function based on scipy.signal package
+        Parameters
+        ----------
+        vector: CPD scores array
+        args: see docs for https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks_cwt.html
+        kwargs
+
+        Returns
+        -------
+        Array with location of peaks
+        """
         peaks = find_peaks_cwt(vector, *args, **kwargs)
         return peaks
     
     @abstractmethod
-    def reference_test_predict(self, X_ref, X_test):
+    def reference_test_predict(self, X: torch.Tensor, y: torch.Tensor):
+        """
+        Training process of forward, backward and optimize steps.
+        Parameters
+        ----------
+        X: train data
+        y: train labels
+
+        Returns
+        -------
+        None
+        """
         pass
 
 
 class OnlineNNClassifier(ChangePointDetection):
-    def __init__(self, net="default", *args, **kwargs):
+    def __init__(self, net: Union[Type[nn.Module], str] = "default", *args, **kwargs):
+        """
+        Parameters
+        ----------
+        net: Custom torch.nn.Module neural network or "default" one
+        args: see parent class
+        kwargs: see parent class
+        """
         super().__init__(*args, **kwargs)
         self.criterion = nn.BCELoss()
         
@@ -155,6 +260,14 @@ class OnlineNNClassifier(ChangePointDetection):
 class OnlineNNRuLSIF(ChangePointDetection):
     
     def __init__(self, alpha, net="default", *args, **kwargs):
+        """
+        Parameters
+        ----------
+        alpha: The `alpha` parameter in a loss function
+        net: Custom torch.nn.Module neural network or "default" one
+        args: see parent class
+        kwargs: see parent class
+        """
         super().__init__(*args, **kwargs)
         
         self.alpha = alpha
@@ -163,7 +276,7 @@ class OnlineNNRuLSIF(ChangePointDetection):
         self.net2 = None
         self.opt1 = None
         self.opt2 = None
-
+    
     def init_net(self, n_inputs):
         self.net1 = self.base_net(n_inputs)
         self.opt1 = self.optimizer(
