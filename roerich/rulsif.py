@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 from .utils import autoregression_matrix, unified_score, reference_test
 
 
-class ChangePointDetectionRuLSIF(object):
+class RuLSIF(object):
     
     def __init__(self, alpha=0.1, kernel_num=100,
                  periods=1, window_size=100, step=1, n_runs=1, debug=0):
