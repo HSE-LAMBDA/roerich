@@ -1,12 +1,5 @@
 import numpy as np
-import pandas as pd
 from sklearn.metrics import roc_curve, roc_auc_score
-
-
-def autoregression_matrix(X, periods=1, fill_value=0):
-    shifted_x = [pd.DataFrame(X).shift(periods=i, fill_value=fill_value).values for i in range(periods)]
-    X_auto = np.hstack(tuple(shifted_x))
-    return X_auto
 
 
 def KL_score_unsym(ref_ratios, test_ratios):

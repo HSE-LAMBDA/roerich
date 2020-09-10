@@ -6,11 +6,10 @@ from typing import Union, Type, Any, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
-from scipy import interpolate
 from scipy.signal import find_peaks_cwt
 
 from .net import MyNN, MyNNRegressor
-from .metrics import autoregression_matrix
+from .utils import autoregression_matrix
 from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 from .scaler import SmaScalerCache
 from .helper import SMA
@@ -162,23 +161,6 @@ class ChangePointDetection(metaclass=ABCMeta):
         X = torch.from_numpy(X).float()
         y = torch.from_numpy(y).float()
         return X, y
-    
-    def unified_score(self, T: np.ndarray, T_score: np.ndarray, score: np.ndarray) -> np.ndarray:
-        """
-        Interpolates a CPD score of T_score interval onto T interval
-        Parameters
-        ----------
-        T: A broader time-step interval
-        T_score: A time intervals of CPD scores
-        score: A CPD scores
-
-        Returns
-        -------
-        Interpolated CPD scores
-        """
-        inter = interpolate.interp1d(T_score, score, kind='previous', fill_value=(0, 0), bounds_error=False)
-        uni_score = inter(T)
-        return uni_score
     
     def find_peaks_cwt(self, vector, *args, **kwargs):
         """
