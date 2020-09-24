@@ -9,7 +9,7 @@ import torch.nn as nn
 from scipy.signal import find_peaks_cwt
 
 from .net import MyNN, MyNNRegressor
-from .utils import autoregression_matrix
+from .utils import autoregression_matrix, unified_score
 from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 from .scaler import SmaScalerCache
 from .helper import SMA
@@ -106,8 +106,8 @@ class ChangePointDetection(metaclass=ABCMeta):
         # todo optimize memory
         T_uni = np.arange(len(X))
         T_scores = T_scores - self._time_shift
-        unified_score = self.unified_score(T_uni, T_scores, scores)
-        avg_unified_score = SMA(unified_score, self.avg_window)
+        un_score = unified_score(T_uni, T_scores, scores)
+        avg_unified_score = SMA(un_score, self.avg_window)
         peaks = self.find_peaks_cwt(avg_unified_score, widths=self.peak_widths)
         
         return avg_unified_score, peaks
