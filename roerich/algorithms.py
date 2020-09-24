@@ -92,8 +92,8 @@ class ChangePointDetection(metaclass=ABCMeta):
         -------
 
         """
-        self.init_net(X.shape[1])
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
+        self.init_net(X_auto.shape[1])
         T, reference, test = self.reference_test(X_auto)
         scores = []
         for i in range(len(reference)):
