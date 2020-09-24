@@ -54,8 +54,8 @@ class SmaScalerCache(BaseScaler):
     
     def fit(self, X):
         if len(self.cache) + len(X) > self.N:
-            for i in range(len(X)):
-                self.cache.popleft()
+            over = len(self.cache) + len(X) - self.N
+            self.cache = self.cache[-over:]
         self.cache.extend(X)
         
         self.mu = np.mean(self.cache, axis=0)
