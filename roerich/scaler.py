@@ -55,6 +55,8 @@ class SmaScalerCache(BaseScaler):
     def fit(self, X):
         if len(self.cache) + len(X) > self.N:
             over = len(self.cache) + len(X) - self.N
+            print(over)
+            print(self.cache[-over:])
             self.cache = self.cache[-over:]
         self.cache.extend(X)
         
