@@ -1,5 +1,6 @@
 import numpy as np
 import collections
+import itertools
 from abc import ABCMeta, abstractmethod
 
 
@@ -50,7 +51,7 @@ class EmaScaler(BaseScaler):
 class SmaScalerCache(BaseScaler):
     def __init__(self, N):
         super(SmaScalerCache, self).__init__(N)
-        self.cache = collections.deque()
+        self.cache = []
     
     def fit(self, X):
         if len(self.cache) + len(X) > self.N:
