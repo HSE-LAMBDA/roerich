@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="roerich",  # Replace with your own username
-    version="0.0.1",
+    version="0.1",
     author="Example Author",
     author_email="kenenbek@gmail.com",
     description="A change point detection package",
