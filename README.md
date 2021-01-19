@@ -20,7 +20,8 @@ python setup.py install
 
 ## Basic usage 
 
-Make sure that your data has a shape `(seq_len, n_dims)` or you can generate synthetic data:
+The following code snippet generates a noisy synthetic data. If you use own dataset, make
+sure that it has a shape `(seq_len, n_dims)`.
 ```python
 import numpy as np
 import roerich
@@ -29,7 +30,8 @@ X, label = roerich.generate_dataset(period=2000, N_tot=20000)
 T = np.arange(len(X))
 ```
 
-You can use two algorithms: `CLF` or `RuLSIF`: 
+To perform change point detection, you can use two algorithms: `CLF` or `RuLSIF`
+followed by calling a `predict method`: 
 
 ```python
 cpd = roerich.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
