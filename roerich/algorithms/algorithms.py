@@ -8,11 +8,11 @@ import torch
 import torch.nn as nn
 from scipy.signal import find_peaks_cwt
 
-from .net import MyNN, MyNNRegressor
-from .utils import autoregression_matrix, unified_score
-from .metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
-from .scaler import SmaScalerCache
-from .helper import SMA
+from roerich.algorithms.net import MyNN, MyNNRegressor
+from roerich.utils import autoregression_matrix, unified_score
+from roerich.metrics.metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
+from roerich.algorithms.scaler import SmaScalerCache
+from roerich.helper import SMA
 
 
 class ChangePointDetection(metaclass=ABCMeta):
