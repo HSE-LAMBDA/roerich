@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from copy import deepcopy
 from joblib import Parallel, delayed
+from scipy import interpolate
+from scipy.signal import argrelmax
 
 
 # utils
@@ -136,6 +138,35 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
             scores.append(ascore)
         
         return np.mean(scores)
+
+
+    def posprocessing(self, T, T_score, score):
+        """
+        Interpolates and shifts a change point detection score, estimates peak positions.
+        
+        Parameters:
+        -----------
+        T: numpy.array
+            A broader time-step interval
+        T_score: numpy.array
+            A time intervals of CPD scores
+        score: numpy.array
+            A CPD scores
+
+        Returns:
+        --------
+        new_score: numpy.array
+            Interpolated and shifted CPD scores.
+        peaks: numpy.array
+            Positions of peaks in the CPD scores.
+        """
+
+        inter = interpolate.interp1d(T_score-self.window_size, score, 
+                                     kind='linear', fill_value=(0, 0), bounds_error=False)
+        new_score = inter(T)
+        peaks = argrelmax(new_score, order=self.window_size)[0]
+
+        return new_score, peaks
         
     
     def predict(self, X):
@@ -159,12 +190,14 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         T, reference, test = reference_test(X_auto, window_size=self.window_size, step=1)
         
         scores = []
-        T_scores = []
+        T_score = []
         iters = range(0, len(reference), self.step)
-        scores = Parallel(n_jobs=-1)(delayed(self.reference_test_predict_n_times)(reference[i], test[i]) for i in iters)
-        T_scores = [T[i] for i in iters]
+        score = Parallel(n_jobs=-1)(delayed(self.reference_test_predict_n_times)(reference[i], test[i]) for i in iters)
+        T_score = np.array([T[i] for i in iters])
+
+        new_score, peaks = self.posprocessing(np.arange(len(X)), T_score, score)
         
-        return np.array(T_scores), np.array(scores)
+        return new_score, peaks
 
     
     
