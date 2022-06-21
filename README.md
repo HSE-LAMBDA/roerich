@@ -1,6 +1,7 @@
-# Roerich
+# Welcome to Roerich
 
 [![PyPI version](https://badge.fury.io/py/roerich.svg)](https://badge.fury.io/py/roerich)
+[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 `roerich` is a library for online and offline change point detection. Currently, it implements
 algorithms based on direct density estimation from this article:
@@ -8,7 +9,6 @@ algorithms based on direct density estimation from this article:
 > Hushchyn, Mikhail, and Andrey Ustyuzhanin. ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
 
 ## Dependencies and install
-This library requires Python >=3.6 and the following packages: numpy, scipy, densratio and matplotlib (the last one is optional and only for display purposes).
 
 ```
 pip install roerich
