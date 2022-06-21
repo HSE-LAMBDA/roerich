@@ -1,6 +1,8 @@
 # Roerich
 
-`roerich` is a library for online and offline change point detection. Currently, it implements 
+[![PyPI version](https://badge.fury.io/py/roerich.svg)](https://badge.fury.io/py/roerich)
+
+`roerich` is a library for online and offline change point detection. Currently, it implements
 algorithms based on direct density estimation from this article:
 
 > Hushchyn, Mikhail, and Andrey Ustyuzhanin. ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
@@ -11,14 +13,14 @@ This library requires Python >=3.6 and the following packages: numpy, scipy, den
 ```
 pip install roerich
 ```
-or 
+or
 ```python
 git clone https://github.com/HSE-LAMBDA/roerich.git
 cd roerich
-python setup.py install 
+python setup.py install
 ```
 
-## Basic usage 
+## Basic usage
 
 The following code snippet generates a noisy synthetic data. If you use own dataset, make
 sure that it has a shape `(seq_len, n_dims)`.
@@ -26,13 +28,13 @@ sure that it has a shape `(seq_len, n_dims)`.
 import numpy as np
 import roerich
 import roerich.algorithms
- 
+
 X, label = roerich.generate_dataset(period=2000, N_tot=20000)
 T = np.arange(len(X))
 ```
 
 To perform change point detection, you can use two algorithms: `CLF` or `RuLSIF`
-followed by calling a `predict method`: 
+followed by calling a `predict method`:
 
 ```python
 cpd = roerich.algorithms.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
@@ -44,7 +46,7 @@ cpd = roerich.algorithms.OnlineNNClassifier(net='default', scaler="default", met
 score, peaks = cpd.predict(X)
 ```
 
-For data visualization use: 
+For data visualization use:
 ```python
 roerich.display(X, T, label, score, T, peaks)
 ```
