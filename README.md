@@ -1,6 +1,7 @@
 # Welcome to Roerich
 
 [![PyPI version](https://badge.fury.io/py/roerich.svg)](https://badge.fury.io/py/roerich)
+[![Downloads](https://pepy.tech/badge/roerich)](https://pepy.tech/project/roerich)
 [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
 `roerich` is a library for online and offline change point detection. Currently, it implements
