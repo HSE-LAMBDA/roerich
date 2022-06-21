@@ -4,10 +4,15 @@
 [![Downloads](https://pepy.tech/badge/roerich)](https://pepy.tech/project/roerich)
 [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-`roerich` is a library for online and offline change point detection. Currently, it implements
+`Roerich` is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.
+
+![](images/700125v1.jpeg)
+_Fragment of "Himalayas", 1933_
+
+Currently, the library implements
 algorithms based on direct density estimation from this article:
 
-> Hushchyn, Mikhail, and Andrey Ustyuzhanin. ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
+> Mikhail Hushchyn, and Andrey Ustyuzhanin, ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
 
 ## Dependencies and install
 
