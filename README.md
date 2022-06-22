@@ -28,34 +28,23 @@ python setup.py install
 
 ## Basic usage
 
-The following code snippet generates a noisy synthetic data. If you use own dataset, make
+The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
 sure that it has a shape `(seq_len, n_dims)`.
 ```python
-import numpy as np
 import roerich
-import roerich.algorithms
+from roerich.algorithms import ChangePointDetectionClassifier
 
-X, label = roerich.generate_dataset(period=2000, N_tot=20000)
-T = np.arange(len(X))
+# generate time series
+X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# detection
+cpd = ChangePointDetectionClassifier()
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
 ```
 
-To perform change point detection, you can use two algorithms: `CLF` or `RuLSIF`
-followed by calling a `predict method`:
-
-```python
-cpd = roerich.algorithms.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
-                                            periods=1, window_size=10, lag_size=500, step=10, n_epochs=10,
-                                            lr=0.1, lam=0.0001, optimizer="Adam"
-                                            )
-
-# Detect change points
-score, peaks = cpd.predict(X)
-```
-
-For data visualization use:
-```python
-roerich.display(X, T, label, score, T, peaks)
-```
 ![](images/demo.png)
 
 ## Thanks to all our contributors
