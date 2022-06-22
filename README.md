@@ -9,10 +9,10 @@
 ![](images/700125v1.jpeg)
 _Fragment of "Himalayas", 1933_
 
-Currently, the library implements
-algorithms based on direct density estimation from this article:
+Currently, the library contains official implementations of change point detection algorithms based on direct density ratio estimation from the following articles:
 
-> Mikhail Hushchyn, and Andrey Ustyuzhanin, ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
+- Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. [[journal]](https://doi.org/10.1016/j.jocs.2021.101385) [[arxiv]](https://doi.org/10.48550/arXiv.2001.06386)
+- Mikhail Hushchyn, Kenenbek Arzymatov and Denis Derkach. “Online Neural Networks for Change-Point Detection.” ArXiv abs/2010.01388 (2020). [[arxiv]](https://doi.org/10.48550/arXiv.2010.01388)
 
 ## Dependencies and install
 
