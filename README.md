@@ -49,10 +49,10 @@ roerich.display(X, cps_true, score, cps_pred)
 
 ## Related libraries
 
-[![Generic badge](https://img.shields.io/badge/^.^-ruptures-<COLOR>.svg)](https://github.com/deepcharles/ruptures)
-[![Generic badge](https://img.shields.io/badge/^.^-klcpd-<COLOR>.svg)](https://github.com/HolyBayes/klcpd)
-[![Generic badge](https://img.shields.io/badge/^.^-tire-<COLOR>.svg)](https://github.com/HolyBayes/TIRE_pytorch)
-[![Generic badge](https://img.shields.io/badge/^.^-bocpd-<COLOR>.svg)](https://github.com/hildensia/bayesian_changepoint_detection)
+[![Generic badge](https://img.shields.io/badge/^.^-ruptures-blue.svg)](https://github.com/deepcharles/ruptures)
+[![Generic badge](https://img.shields.io/badge/^.^-klcpd-blue.svg)](https://github.com/HolyBayes/klcpd)
+[![Generic badge](https://img.shields.io/badge/^.^-tire-blue.svg)](https://github.com/HolyBayes/TIRE_pytorch)
+[![Generic badge](https://img.shields.io/badge/^.^-bocpd-blue.svg)](https://github.com/hildensia/bayesian_changepoint_detection)
 
 ## Thanks to all our contributors
 
