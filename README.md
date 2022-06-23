@@ -1,54 +1,58 @@
-# Roerich
+# Welcome to Roerich
 
-`roerich` is a library for online and offline change point detection. Currently, it implements 
-algorithms based on direct density estimation from this article:
+[![PyPI version](https://badge.fury.io/py/roerich.svg)](https://badge.fury.io/py/roerich)
+[![Downloads](https://pepy.tech/badge/roerich)](https://pepy.tech/project/roerich)
+[![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-> Hushchyn, Mikhail, and Andrey Ustyuzhanin. ‘Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation’. ArXiv:2001.06386 [Cs, Stat], Jan. 2020. arXiv.org, http://arxiv.org/abs/2001.06386.
+`Roerich` is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.
+
+![](images/700125v1.jpeg)
+_Fragment of "Himalayas", 1933_
+
+Currently, the library contains official implementations of change point detection algorithms based on direct density ratio estimation from the following articles:
+
+- Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. [[journal]](https://doi.org/10.1016/j.jocs.2021.101385) [[arxiv]](https://doi.org/10.48550/arXiv.2001.06386)
+- Mikhail Hushchyn, Kenenbek Arzymatov and Denis Derkach. “Online Neural Networks for Change-Point Detection.” ArXiv abs/2010.01388 (2020). [[arxiv]](https://doi.org/10.48550/arXiv.2010.01388)
 
 ## Dependencies and install
-This library requires Python >=3.6 and the following packages: numpy, scipy, densratio and matplotlib (the last one is optional and only for display purposes).
 
 ```
 pip install roerich
 ```
-or 
+or
 ```python
 git clone https://github.com/HSE-LAMBDA/roerich.git
 cd roerich
-python setup.py install 
+python setup.py install
 ```
 
-## Basic usage 
+## Basic usage
 
-The following code snippet generates a noisy synthetic data. If you use own dataset, make
+The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
 sure that it has a shape `(seq_len, n_dims)`.
 ```python
-import numpy as np
 import roerich
-import roerich.algorithms
- 
-X, label = roerich.generate_dataset(period=2000, N_tot=20000)
-T = np.arange(len(X))
+from roerich.algorithms import ChangePointDetectionClassifier
+
+# generate time series
+X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# detection
+cpd = ChangePointDetectionClassifier()
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
 ```
 
-To perform change point detection, you can use two algorithms: `CLF` or `RuLSIF`
-followed by calling a `predict method`: 
-
-```python
-cpd = roerich.algorithms.OnlineNNClassifier(net='default', scaler="default", metric="KL_sym",
-                                            periods=1, window_size=10, lag_size=500, step=10, n_epochs=10,
-                                            lr=0.1, lam=0.0001, optimizer="Adam"
-                                            )
-
-# Detect change points
-score, peaks = cpd.predict(X)
-```
-
-For data visualization use: 
-```python
-roerich.display(X, T, label, score, T, peaks)
-```
 ![](images/demo.png)
+
+## Related libraries
+
+[![Generic badge](https://img.shields.io/badge/^.^-ruptures-blue.svg)](https://github.com/deepcharles/ruptures)
+[![Generic badge](https://img.shields.io/badge/^.^-klcpd-blue.svg)](https://github.com/HolyBayes/klcpd)
+[![Generic badge](https://img.shields.io/badge/^.^-tire-blue.svg)](https://github.com/HolyBayes/TIRE_pytorch)
+[![Generic badge](https://img.shields.io/badge/^.^-bocpd-blue.svg)](https://github.com/hildensia/bayesian_changepoint_detection)
 
 ## Thanks to all our contributors
 
