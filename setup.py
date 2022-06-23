@@ -7,7 +7,7 @@ setuptools.setup(
     name="roerich",  # Replace with your own username
     version="0.3.0",
     author=["Mikhail Hushchyn", "Kenenbek Arzymatov"],
-    author_email=["hushchyn.mikhail@gmailcom", "kenenbek@gmail.com"],
+    author_email=["hushchyn.mikhail@gmail.com", "kenenbek@gmail.com"],
     description="Roerich is a python library for online and offline change point detection in time series data based on machine learning.",
     long_description=long_description,
     long_description_content_type="text/markdown",
