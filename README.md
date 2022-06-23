@@ -6,7 +6,7 @@
 
 `Roerich` is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.
 
-![](images/700125v1.jpeg)
+![](https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/700125v1.jpeg)
 _Fragment of "Himalayas", 1933_
 
 Currently, the library contains official implementations of change point detection algorithms based on direct density ratio estimation from the following articles:
@@ -45,7 +45,7 @@ score, cps_pred = cpd.predict(X)
 roerich.display(X, cps_true, score, cps_pred)
 ```
 
-![](images/demo.png)
+![](https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/demo.png)
 
 ## Related libraries
 
