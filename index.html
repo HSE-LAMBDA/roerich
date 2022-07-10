@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Roerich</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/roerich/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Roerich
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dependencies-and-install">Dependencies and install</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#related-libraries">Related libraries</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#thanks-to-all-our-contributors">Thanks to all our contributors</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Roerich</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/HSE-LAMBDA/roerich/edit/master/docs/index.md"> Edit on HSE-LAMBDA/roerich</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="welcome-to-roerich">Welcome to Roerich</h1>
+<p><a href="https://badge.fury.io/py/roerich"><img alt="PyPI version" src="https://badge.fury.io/py/roerich.svg" /></a>
+<a href="https://pepy.tech/project/roerich"><img alt="Downloads" src="https://pepy.tech/badge/roerich" /></a>
+<a href="https://opensource.org/licenses/BSD-2-Clause"><img alt="License" src="https://img.shields.io/badge/License-BSD_2--Clause-orange.svg" /></a></p>
+<p><code>Roerich</code> is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.</p>
+<p><img alt="" src="https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/700125v1.jpeg" />
+<em>Fragment of "Himalayas", 1933</em></p>
+<p>Currently, the library contains official implementations of change point detection algorithms based on direct density ratio estimation from the following articles:</p>
+<ul>
+<li>Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. <a href="https://doi.org/10.1016/j.jocs.2021.101385">[journal]</a> <a href="https://doi.org/10.48550/arXiv.2001.06386">[arxiv]</a></li>
+<li>Mikhail Hushchyn, Kenenbek Arzymatov and Denis Derkach. “Online Neural Networks for Change-Point Detection.” ArXiv abs/2010.01388 (2020). <a href="https://doi.org/10.48550/arXiv.2010.01388">[arxiv]</a></li>
+</ul>
+<h2 id="dependencies-and-install">Dependencies and install</h2>
+<pre><code>pip install roerich
+</code></pre>
+<p>or</p>
+<pre><code class="language-python">git clone https://github.com/HSE-LAMBDA/roerich.git
+cd roerich
+python setup.py install
+</code></pre>
+<h2 id="basic-usage">Basic usage</h2>
+<p>The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
+sure that it has a shape <code>(seq_len, n_dims)</code>.</p>
+<pre><code class="language-python">import roerich
+from roerich.algorithms import ChangePointDetectionClassifier
+
+# generate time series
+X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# detection
+cpd = ChangePointDetectionClassifier()
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
+</code></pre>
+<p><img alt="" src="https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/demo.png" /></p>
+<h2 id="related-libraries">Related libraries</h2>
+<p><a href="https://github.com/deepcharles/ruptures"><img alt="Generic badge" src="https://img.shields.io/badge/^.^-ruptures-blue.svg" /></a>
+<a href="https://github.com/HolyBayes/klcpd"><img alt="Generic badge" src="https://img.shields.io/badge/^.^-klcpd-blue.svg" /></a>
+<a href="https://github.com/HolyBayes/TIRE_pytorch"><img alt="Generic badge" src="https://img.shields.io/badge/^.^-tire-blue.svg" /></a>
+<a href="https://github.com/hildensia/bayesian_changepoint_detection"><img alt="Generic badge" src="https://img.shields.io/badge/^.^-bocpd-blue.svg" /></a></p>
+<h2 id="thanks-to-all-our-contributors">Thanks to all our contributors</h2>
+<p><a href="https://github.com/HSE-LAMBDA/roerich/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=HSE-LAMBDA/roerich" />
+</a></p>
+<h2 id="license">License</h2>
+<pre><code>BSD 2-Clause License
+
+Copyright (c) 2017, ENS Paris-Saclay, CNRS
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</code></pre>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.0
+Build Date UTC : 2022-07-10 15:52:19.053820+00:00
+-->
