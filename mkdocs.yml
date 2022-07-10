@@ -5,5 +5,7 @@ docs_dir: docs
 theme:
     name: readthedocs
     highlightjs: true
+markdown_extensions:
+    - markdown_include.include
 nav:
     - Home: 'index.md'
