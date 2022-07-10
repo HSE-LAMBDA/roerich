@@ -1,0 +1,9 @@
+site_name: Roerich
+repo_url: https://github.com/HSE-LAMBDA/roerich
+repo_name: HSE-LAMBDA/roerich
+docs_dir: docs
+theme:
+    name: readthedocs
+    highlightjs: true
+nav:
+    - Home: 'index.md'
