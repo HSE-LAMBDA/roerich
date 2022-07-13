@@ -48,6 +48,11 @@ roerich.display(X, cps_true, score, cps_pred)
 
 ![](https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/demo.png)
 
+## Support
+
+- Documentation: [https://hse-lambda.github.io/roerich](https://hse-lambda.github.io/roerich)
+- For any usage questions, suggestions and bugs use the [issue page](https://github.com/HSE-LAMBDA/roerich/issues), please.
+
 ## Related libraries
 
 [![Generic badge](https://img.shields.io/badge/^.^-ruptures-blue.svg)](https://github.com/deepcharles/ruptures)
