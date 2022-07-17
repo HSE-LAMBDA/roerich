@@ -1,11 +1,14 @@
 site_name: Roerich
 site_url: https://hse-lambda.github.io/roerich/
 repo_url: https://github.com/HSE-LAMBDA/roerich
-repo_name: HSE-LAMBDA/roerich
+edit_uri: tree/main/docs
+repo_name: GitHub
 docs_dir: docs
 theme:
     name: readthedocs
     highlightjs: true
+    include_homepage_in_sidebar: true
+    prev_next_buttons_location: bottom
 markdown_extensions:
     - markdown_include.include
     - extra
