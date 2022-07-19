@@ -21,3 +21,8 @@ extra_javascript:
 nav:
     - Home: 'index.md'
     - Change point: about.md
+    - Detection algorithms:
+        - ChangePointDetectionClassifier: cpdclassifier.md
+        - ChangePointDetectionRuLSIF: cpdrulsif.md
+        - OnlineNNClassifier: onnc.md
+        - OnlineNNRuLSIF: onnr.md
