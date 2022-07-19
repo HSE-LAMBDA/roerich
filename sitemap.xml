@@ -2,12 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hse-lambda.github.io/roerich/</loc>
-         <lastmod>2022-07-17</lastmod>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/about/</loc>
-         <lastmod>2022-07-17</lastmod>
+         <lastmod>2022-07-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/cpdclassifier/</loc>
+         <lastmod>2022-07-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/cpdrulsif/</loc>
+         <lastmod>2022-07-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/onnc/</loc>
+         <lastmod>2022-07-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/onnr/</loc>
+         <lastmod>2022-07-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

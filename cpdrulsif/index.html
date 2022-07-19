@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/about/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/cpdrulsif/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Change point - Roerich</title>
+    <title>ChangePointDetectionRuLSIF - Roerich</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Change point";
-        var mkdocs_page_input_path = "about.md";
-        var mkdocs_page_url = "/roerich/about/";
+        var mkdocs_page_name = "ChangePointDetectionRuLSIF";
+        var mkdocs_page_input_path = "cpdrulsif.md";
+        var mkdocs_page_url = "/roerich/cpdrulsif/";
       </script>
     
     <script src="../js/jquery-3.6.0.min.js" defer></script>
@@ -44,21 +44,21 @@
                 <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
               </ul>
-              <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Change point</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#formal-definition">Formal definition</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#applications">Applications</a>
-    </li>
-    </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../about/">Change point</a>
                 </li>
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">ChangePointDetectionRuLSIF</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnc/">OnlineNNClassifier</a>
                   </li>
@@ -78,9 +78,10 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Change point</li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Detection algorithms &raquo;</li><li>ChangePointDetectionRuLSIF</li>
     <li class="wy-breadcrumbs-aside">
-        <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/about.md"
+        <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/cpdrulsif.md"
           class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
@@ -90,26 +91,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="change-point">Change point</h1>
-<h2 id="formal-definition">Formal definition</h2>
-<p>Abrupt change of time series behaviour is called a change-point. Consider a <script type="math/tex">d-</script>dimensional signal with a change point at a moment <script type="math/tex">\nu</script>:</p>
-<p>
-<script type="math/tex; mode=display">
-x_1, x_2, \cdots, x_{\nu-1}, x_{\nu}, x_{\nu+1}, x_{\nu+2}, \cdots
-</script>
-</p>
-<p>In the most general case, the observations are arbitrary dependent and nonidentically distributed. Change point is a moment of time, when distribution of time series observations changes. Thus, it can be described as changing of conditional pre-change densities <script type="math/tex">p_0(x_i|x_1, \cdots, x_{i-1})</script> for <script type="math/tex">i \le \nu</script> to conditional post-change densities <script type="math/tex">p_1(x_i|x_1, \cdots, x_{i-1})</script> for <script type="math/tex">i > \nu</script>. In a typical setup this is an unsupervised task with unknown signal distributions. Figure 1 shows an example with several change points and results of their detection.</p>
-<p><img alt="" src="https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/demo.png" />
-<em>Figure 1. Example of change points.</em></p>
-<h2 id="applications">Applications</h2>
-<p>There is a range of various applications of change point detection [1]: quality control of production process, structural health monitoring of wind turbines, and aircraft, detecting multiple sensor faults, detecting road traffic incidents or changes in highway traffic condition, chemical process control, physiological data analysis, surveillance of daily disease counts, nanoscale analysis of soft biomaterials, biosurveillance, radio-astronomy and interferometry, spectrum sensing in cognitive radio systems, leak detection in water channels, environmental monitoring, handling climate changes, navigation systems monitoring, human motion analysis, video scene analysis, sequential steganography, biometric identification, onset detection in music signals, detecting changes in large payment card datasets, distributed systems monitoring, detection of intrusion, viruses, and other denial of service (DoS) attacks, segmentation of signals and images, tracking the preferences of users in recommendation systems, seismic data processing, analysis of financial data and others.</p>
-<p>[1] Alexander Tartakovsky, Igor Nikiforov, and Michele Basseville. 2014. Sequential Analysis: Hypothesis Testing and Changepoint Detection (1st. ed.). Chapman &amp; Hall/CRC.</p>
+                <h1 id="changepointdetectionrulsif">ChangePointDetectionRuLSIF</h1>
+<h2 id="description">Description</h2>
+<p><code>ChangePointDetectionRuLSIF</code> [1] is an offline change point detection algorithm based on RuLSIF [2, 3] regressors. It scans a signal with a two consecutive windows with some width. The method uses a RuLSIF regression for direct estimation of the probability density ratio for observations inside these windows. Then, it calculates the Pearson (PE) divergence based on these ratios and considers it as a change point detection score for the windows pair.</p>
+<ul>
+<li>[1] Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. <a href="https://doi.org/10.1016/j.jocs.2021.101385">[journal]</a> <a href="https://doi.org/10.48550/arXiv.2001.06386">[arxiv]</a></li>
+<li>[2] Makoto Yamada, Taiji Suzuki, Takafumi Kanamori, Hirotaka Hachiya, Masashi Sugiyama; Relative Density-Ratio Estimation for Robust Distribution Comparison. Neural Comput 2013; 25 (5): 1324–1370. <a href="https://doi.org/10.1162/NECO_a_00442">[DOI]</a></li>
+<li>[3] Song Liu, Makoto Yamada, Nigel Collier, Masashi Sugiyama, Change-point detection in time-series data by relative density-ratio estimation, Neural Networks, V. 43, 2013, pp. 72-83.
+<a href="https://doi.org/10.1016/j.neunet.2013.01.012">[DOI]</a></li>
+</ul>
+<h2 id="usage">Usage</h2>
+<pre><code class="language-python">import roerich
+from roerich.algorithms import ChangePointDetectionRuLSIF
+from roerich.algorithms import GBDTRuLSIFRegressor
+
+# generate time series
+X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# RuLSIF regressor
+reg = GBDTRuLSIFRegressor(n_estimators=10)
+
+# change points detection
+cpd = ChangePointDetectionRuLSIF(base_regressor=reg, metric='PE', periods=1,
+                                 window_size=100, step=5, n_runs=1)
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
+</code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../cpdclassifier/" class="btn btn-neutral float-right" title="ChangePointDetectionClassifier">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../cpdclassifier/" class="btn btn-neutral float-left" title="ChangePointDetectionClassifier"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../onnc/" class="btn btn-neutral float-right" title="OnlineNNClassifier">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -136,10 +151,10 @@ x_1, x_2, \cdots, x_{\nu-1}, x_{\nu}, x_{\nu+1}, x_{\nu+2}, \cdots
         </span>
     
     
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../cpdclassifier/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../cpdclassifier/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../onnc/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
