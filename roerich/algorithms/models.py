@@ -131,6 +131,28 @@ class NNClassifier(object):
         return y_pred
 
 
+    def predict_proba_ratio(self, X):
+        """
+        Predicts probability ratio for the objects.
+
+        Parameters:
+        -----------
+        X: numpy.ndarray
+            Matrix of input objects with shape (n_objects, n_features).
+
+        Returns:
+        --------
+        y_pred: numpy.ndarray
+            Predicted target values with shape (n_objects, 1).
+        """
+
+        eps = 10**-3
+        proba_pos = self.predict_proba(X)[:, 1]
+        ratios = proba_pos / (1 - proba_pos + eps)
+
+        return ratios
+
+
 
 
 # Regreesions
