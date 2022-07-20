@@ -30,3 +30,5 @@ nav:
         - GBDTRuLSIFRegressor: gbdtrulsif.md
         - NNRuLSIFRegressor: nnrulsif.md
         - NNClassifier: nnclassifier.md
+    - Quality metrics:
+        - Precision and Recall: pr.md
