@@ -3,18 +3,18 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/onnc/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/nnclassifier/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>OnlineNNClassifier - Roerich</title>
+    <title>NNClassifier - Roerich</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
     
       <script>
         // Current page data
-        var mkdocs_page_name = "OnlineNNClassifier";
-        var mkdocs_page_input_path = "onnc.md";
-        var mkdocs_page_url = "/roerich/onnc/";
+        var mkdocs_page_name = "NNClassifier";
+        var mkdocs_page_input_path = "nnclassifier.md";
+        var mkdocs_page_url = "/roerich/nnclassifier/";
       </script>
     
     <script src="../js/jquery-3.6.0.min.js" defer></script>
@@ -49,29 +49,29 @@
                 </li>
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
-              <ul class="current">
+              <ul>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
                   </li>
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">OnlineNNClassifier</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../onnc/">OnlineNNClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../onnr/">OnlineNNRuLSIF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Density ratio</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../gbdtrulsif/">GBDTRuLSIFRegressor</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../nnrulsif/">NNRuLSIFRegressor</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">NNClassifier</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#description">Description</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
     </ul>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../onnr/">OnlineNNRuLSIF</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Density ratio</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../gbdtrulsif/">GBDTRuLSIFRegressor</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../nnrulsif/">NNRuLSIFRegressor</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../nnclassifier/">NNClassifier</a>
                   </li>
               </ul>
       </div>
@@ -88,9 +88,9 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Detection algorithms &raquo;</li><li>OnlineNNClassifier</li>
+          <li>Density ratio &raquo;</li><li>NNClassifier</li>
     <li class="wy-breadcrumbs-aside">
-        <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/onnc.md"
+        <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/nnclassifier.md"
           class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
@@ -100,35 +100,51 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="onlinennclassifier">OnlineNNClassifier</h1>
+                <h1 id="nnclassifier">NNClassifier</h1>
 <h2 id="description">Description</h2>
-<p><code>OnlineNNClassifier</code> [1] is an online change point detection algorithm based on a binary classifier. It scans a signal with a two windows with small width (1, 5, 10) and a lag (50, 100) between them. The method uses a neural network classifier for direct estimation of the probability density ratio for observations inside these windows. We train the NN in online manner: update its weights with new observations of the signal. Then, it calculates the symmetrical Kullback-Leibler (KL_sym) divergence based on these ratios and considers it as a change point detection score for the windows pair.</p>
+<p><code>NNClassifier</code> [1] is an algorithm for the direct density ratio estimation for two samples. It is a Neural Network model for binary classification task. The algorithm takes two samples and learns the ratio of their probability densities without estimation of individual distributions. The classifier learns to separate the samples into two classes. According to [1], the density ratio <script type="math/tex">w(x)</script> can be estimated using predictions <script type="math/tex">f(x)</script> of the classifier:</p>
+<p>
+<script type="math/tex; mode=display">
+w(x) = \frac{f(x)}{1 - f(x)}
+</script>
+</p>
+<p>The density ratios help to calculate of different dissimilarity scores between the samples, that are used in change-point detection and other applications.</p>
 <ul>
-<li>[1] Mikhail Hushchyn, Kenenbek Arzymatov and Denis Derkach. “Online Neural Networks for Change-Point Detection.” ArXiv abs/2010.01388 (2020). <a href="https://doi.org/10.48550/arXiv.2010.01388">[arxiv]</a></li>
+<li>[1] Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. <a href="https://doi.org/10.1016/j.jocs.2021.101385">[journal]</a> <a href="https://doi.org/10.48550/arXiv.2001.06386">[arxiv]</a></li>
 </ul>
 <h2 id="usage">Usage</h2>
-<pre><code class="language-python">import roerich
-from roerich.algorithms import OnlineNNClassifier
+<pre><code class="language-python">from roerich.algorithms import NNClassifier
+from scipy.stats import norm, uniform
+import matplotlib.pyplot as plt
+import numpy as np
 
-# generate time series
-X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+N = 1000
 
-# change points detection
-cpd = OnlineNNClassifier(net='default', scaler=&quot;default&quot;, metric=&quot;KL_sym&quot;,
-                        periods=1, window_size=10, lag_size=100, step=5,
-                        n_epochs=10, lr=0.01, lam=0.0001, optimizer=&quot;Adam&quot;)
+# generate samples
+p0 = uniform(-5, 10)
+p1 = norm(0, 1)
+X = np.concatenate((p0.rvs((N, 1)), p1.rvs((N, 1))))
+y = np.array([0]*N + [1]*N)
 
-score, cps_pred = cpd.predict(X)
+# true density ratio
+true_ratio = p1.pdf(X) / p0.pdf(X)
+
+# direct density ratio estimation
+reg = NNClassifier(n_hidden=10, n_epochs=100, batch_size=64, lr=0.01, l2=0.001)
+reg.fit(X, y)
+pred_ratio = reg.predict_proba_ratio(X)
 
 # visualization
-roerich.display(X, cps_true, score, cps_pred)
+plt.scatter(X, pred_ratio, label='pred')
+plt.scatter(X, true_ratio, label='true')
+plt.legend()
+plt.show()
 </code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../cpdrulsif/" class="btn btn-neutral float-left" title="ChangePointDetectionRuLSIF"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../onnr/" class="btn btn-neutral float-right" title="OnlineNNRuLSIF">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../nnrulsif/" class="btn btn-neutral float-left" title="NNRuLSIFRegressor"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -155,10 +171,8 @@ roerich.display(X, cps_true, score, cps_pred)
         </span>
     
     
-      <span><a href="../cpdrulsif/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../nnrulsif/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
-    
-      <span><a href="../onnr/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

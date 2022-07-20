@@ -26,6 +26,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://hse-lambda.github.io/roerich/nnclassifier/</loc>
+         <lastmod>2022-07-20</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://hse-lambda.github.io/roerich/nnrulsif/</loc>
          <lastmod>2022-07-20</lastmod>
          <changefreq>daily</changefreq>
