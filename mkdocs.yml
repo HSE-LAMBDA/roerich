@@ -29,3 +29,4 @@ nav:
     - Density ratio:
         - GBDTRuLSIFRegressor: gbdtrulsif.md
         - NNRuLSIFRegressor: nnrulsif.md
+        - NNClassifier: nnclassifier.md
