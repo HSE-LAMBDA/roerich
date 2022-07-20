@@ -20,10 +20,10 @@ def find_peaks(score, order):
     cps_score_pred: numpy.array
         Change point detection score for the detected indices of the change points.
     """
-    
+
     cps_pred = argrelmax(score, order=order)[0]
     cps_score_pred = score[cps_pred]
-    
+
     return cps_pred, cps_score_pred
 
 
@@ -48,13 +48,16 @@ def precision_recall_scores(cps_true, cps_pred, window=20):
         Recall score value.
     """
 
+    cps_true = np.array(cps_true)
+    cps_pred = np.array(cps_pred)
+
     n_cr = 0
     n_cp = len(cps_true)
     n_al = len(cps_pred)
-    
-    if n_al == 0: 
+
+    if n_al == 0:
         return 0, 0
-    
+
     if n_cp == 0:
         return 0, 1
 
@@ -71,7 +74,7 @@ def precision_recall_scores(cps_true, cps_pred, window=20):
 
     recall = tpr
     precision = 1 - fpr
-    
+
     return precision, recall
 
 
@@ -183,7 +186,7 @@ def precision_recall_curve(cps_true, cps_pred, cps_score_pred=None, window=20):
     cps_pred: array-like
         Detected indices of change points. Example: [0, 102, 195, 298, 303].
     cps_score_pred: array-like
-        Change point detection score for the detected indices of the change points. 
+        Change point detection score for the detected indices of the change points.
         If 'None', then the score for all change points is taken equal to 1.
     window: int
         Maximum allowed distance between true and predicted change points.
@@ -201,15 +204,19 @@ def precision_recall_curve(cps_true, cps_pred, cps_score_pred=None, window=20):
     if cps_score_pred is None:
         cps_score_pred = np.ones(cps_pred.shape)
 
+    cps_true = np.array(cps_true)
+    cps_pred = np.array(cps_pred)
+    cps_score_pred = np.array(cps_score_pred)
+
     thresholds = np.unique(cps_score_pred)
-    
+
     data = []
     for thr in thresholds:
-        
-        cps_thr = cps_pred[cps_score_pred > thr]
-        precision, recall = precision_recall_scores(cps_true, cps_pred, window)
+
+        cps_thr = cps_pred[cps_score_pred >= thr]
+        precision, recall = precision_recall_scores(cps_true, cps_thr, window)
         data.append([thr, precision, recall])
-        
+
     data.insert(0, [-999, 0.0, 1.0])
     data.append([999, 1.0, 0.0])
     data = np.array(data)
@@ -236,10 +243,14 @@ def auc_score(thresholds, precision, recall):
     auc: float
         The precision-recall curve auc value.
     """
-    
+
+    thresholds = np.array(thresholds)
+    precision = np.array(precision)
+    recall = np.array(recall)
+
     sorted_inds = thresholds.argsort()
     auc = np.abs(np.trapz(precision[sorted_inds], recall[sorted_inds]))
-    
+
     return auc
 
 
@@ -255,7 +266,7 @@ def pr_auc(cps_true, cps_pred, cps_score_pred=None, window=20):
     cps_pred: array-like
         Detected indices of change points. Example: [0, 102, 195, 298, 303].
     cps_score_pred: array-like
-        Change point detection score for the detected indices of the change points. 
+        Change point detection score for the detected indices of the change points.
         If 'None', then the score for all change points is taken equal to 1.
     window: int
         Maximum allowed distance between true and predicted change points.
@@ -270,4 +281,3 @@ def pr_auc(cps_true, cps_pred, cps_score_pred=None, window=20):
     auc = auc_score(thresholds, precision, recall)
 
     return auc
-
