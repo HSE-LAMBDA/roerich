@@ -26,3 +26,6 @@ nav:
         - ChangePointDetectionRuLSIF: cpdrulsif.md
         - OnlineNNClassifier: onnc.md
         - OnlineNNRuLSIF: onnr.md
+    - Density ratio:
+        - GBDTRuLSIFRegressor: gbdtrulsif.md
+        - NNRuLSIFRegressor: nnrulsif.md
