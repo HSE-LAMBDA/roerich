@@ -4,6 +4,7 @@ repo_url: https://github.com/HSE-LAMBDA/roerich
 edit_uri: tree/main/docs
 repo_name: GitHub
 docs_dir: docs
+site_dir: site
 theme:
     name: readthedocs
     highlightjs: true
@@ -18,6 +19,10 @@ markdown_extensions:
     - fenced_code
 extra_javascript:
     - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+plugins:
+  - mknotebooks
+  - search
+  # - mkdocs-jupyter
 nav:
     - Home: 'index.md'
     - Change point: about.md
@@ -32,3 +37,5 @@ nav:
         - NNClassifier: nnclassifier.md
     - Quality metrics:
         - Precision and Recall: pr.md
+    - Examples:
+      - Human activity recognition: examples/wisdm.ipynb
