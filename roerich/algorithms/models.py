@@ -64,6 +64,7 @@ class NNClassifier(object):
         self.lr = lr
         self.l2 = l2
         self.scaler = StandardScaler()
+        self.class_ratio = 1
 
 
     def get_data_loader(self, X, y):
@@ -87,6 +88,9 @@ class NNClassifier(object):
         y: numpy.array
             Array of targets with shape (n_objects,).
         """
+
+        y = np.array(y)
+        self.class_ratio = (y == 1).sum() / (y == 0).sum()
 
         X_ss = self.scaler.fit_transform(X)
         train_loader = self.get_data_loader(X_ss, y)
@@ -148,7 +152,7 @@ class NNClassifier(object):
 
         eps = 10**-3
         proba_pos = self.predict_proba(X)[:, 1]
-        ratios = proba_pos / (1 - proba_pos + eps)
+        ratios = (proba_pos / (1 - proba_pos + eps)) / self.class_ratio
 
         return ratios
 
