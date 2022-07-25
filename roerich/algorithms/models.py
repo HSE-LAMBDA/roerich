@@ -394,10 +394,13 @@ class GBDTRuLSIFRegressor(object):
             X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=self.sample_frac)
             pred_train = self.predict(X_train)
             grad = - self.pe_loss_grad(pred_train, y_train)
+            n1 = (y_train == 1).sum()
+            n0 = (y_train == 0).sum()
+            weights = ((y_train == 1) / n1 + (y_train == 0) / n0) * (n1 + n0)
             atree = DecisionTreeRegressor(max_depth=self.max_depth, min_samples_leaf=self.min_samples_leaf,
                                           min_samples_split=self.min_samples_split, splitter=self.splitter,
                                           max_features=self.max_features)
-            atree.fit(X_train, grad)
+            atree.fit(X_train, grad, weights)
             self.estimators.append(atree)
 
 
