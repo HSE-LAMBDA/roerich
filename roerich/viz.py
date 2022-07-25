@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def display(X, cps_true, score, cps_pred=None, plot_peak_height=10, s_max=10):
+def display(X, cps_true, score=None, cps_pred=None, plot_peak_height=10, s_max=10):
 
     T = np.arange(len(X))
     L = np.zeros(len(X))
@@ -29,17 +29,18 @@ def display(X, cps_true, score, cps_pred=None, plot_peak_height=10, s_max=10):
         plt.tight_layout()
 
     score_plot_ix = n if cps_pred is None else n - 1
-    d = 0.05 * (score.max() - score.min())
-    plt.subplot(n, 1, score_plot_ix)
-    plt.plot(T, score, linewidth=3, label="Change point score", color='C3')
-    for t in T[L == 1]:
-        plt.plot([t]*2, [score.min()-d, score.max()+d], color='0', linestyle='--')
-    plt.ylim(score.min()-d, score.max()+d)
-    plt.xlim(0, T.max())
-    plt.xticks(size=16)
-    plt.yticks(size=16)
-    plt.legend(loc='upper left', fontsize=16)
-    plt.tight_layout()
+    if score is not None:
+        d = 0.05 * (score.max() - score.min())
+        plt.subplot(n, 1, score_plot_ix)
+        plt.plot(T, score, linewidth=3, label="Change point score", color='C3')
+        for t in T[L == 1]:
+            plt.plot([t]*2, [score.min()-d, score.max()+d], color='0', linestyle='--')
+        plt.ylim(score.min()-d, score.max()+d)
+        plt.xlim(0, T.max())
+        plt.xticks(size=16)
+        plt.yticks(size=16)
+        plt.legend(loc='upper left', fontsize=16)
+        plt.tight_layout()
 
     # display find peaks #todo refactoring
     if cps_pred is not None:
