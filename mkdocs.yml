@@ -39,3 +39,4 @@ nav:
         - Precision and Recall: pr.md
     - Examples:
       - Human activity recognition: examples/wisdm.ipynb
+      - Earthquake detection: examples/seismic.ipynb
