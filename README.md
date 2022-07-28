@@ -5,7 +5,7 @@
 [![Downloads](https://pepy.tech/badge/roerich)](https://pepy.tech/project/roerich)
 [![License](https://img.shields.io/badge/License-BSD_2--Clause-orange.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-`Roerich` is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.
+`Roerich` is a python library for online and offline change point detection for time series analysis, signal processing, and segmentation. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.
 
 ![](https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/700125v1.jpeg)
 _Fragment of "Himalayas", 1933_
@@ -29,6 +29,8 @@ python setup.py install
 
 ## Basic usage
 
+(See more examples in the [documentation](https://hse-lambda.github.io/roerich).)
+
 The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
 sure that it has a shape `(seq_len, n_dims)`.
 ```python
@@ -50,6 +52,7 @@ roerich.display(X, cps_true, score, cps_pred)
 
 ## Support
 
+- Home: [https://github.com/HSE-LAMBDA/roerich](https://github.com/HSE-LAMBDA/roerich)
 - Documentation: [https://hse-lambda.github.io/roerich](https://hse-lambda.github.io/roerich)
 - For any usage questions, suggestions and bugs use the [issue page](https://github.com/HSE-LAMBDA/roerich/issues), please.
 
@@ -71,7 +74,7 @@ roerich.display(X, cps_true, score, cps_pred)
 ```
 BSD 2-Clause License
 
-Copyright (c) 2017, ENS Paris-Saclay, CNRS
+Copyright (c) 2020 Laboratory of methods for Big Data Analysis at HSE
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
