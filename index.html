@@ -92,6 +92,8 @@
               </ul>
               <p class="caption"><span class="caption-text">Examples</span></p>
               <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="examples/demo/">Basics</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="examples/wisdm/">Human activity recognition</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="examples/seismic/">Earthquake detection</a>
@@ -127,7 +129,7 @@
 <a href="https://hse-lambda.github.io/roerich"><img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-green.svg" /></a>
 <a href="https://pepy.tech/project/roerich"><img alt="Downloads" src="https://pepy.tech/badge/roerich" /></a>
 <a href="https://opensource.org/licenses/BSD-2-Clause"><img alt="License" src="https://img.shields.io/badge/License-BSD_2--Clause-orange.svg" /></a></p>
-<p><code>Roerich</code> is a python library for online and offline change point detection in time series data. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.</p>
+<p><code>Roerich</code> is a python library for online and offline change point detection for time series analysis, signal processing, and segmentation. It was named after the painter Nicholas Roerich, known as the Master of the Mountains. Read more at: https://www.roerich.org.</p>
 <p><img alt="" src="https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/700125v1.jpeg" />
 <em>Fragment of "Himalayas", 1933</em></p>
 <p>Currently, the library contains official implementations of change point detection algorithms based on direct density ratio estimation from the following articles:</p>
@@ -144,6 +146,7 @@ cd roerich
 python setup.py install
 </code></pre>
 <h2 id="basic-usage">Basic usage</h2>
+<p>(See more examples in the <a href="https://hse-lambda.github.io/roerich">documentation</a>.)</p>
 <p>The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
 sure that it has a shape <code>(seq_len, n_dims)</code>.</p>
 <pre><code class="language-python">import roerich
@@ -162,6 +165,7 @@ roerich.display(X, cps_true, score, cps_pred)
 <p><img alt="" src="https://raw.githubusercontent.com/HSE-LAMBDA/roerich/main/images/demo.png" /></p>
 <h2 id="support">Support</h2>
 <ul>
+<li>Home: <a href="https://github.com/HSE-LAMBDA/roerich">https://github.com/HSE-LAMBDA/roerich</a></li>
 <li>Documentation: <a href="https://hse-lambda.github.io/roerich">https://hse-lambda.github.io/roerich</a></li>
 <li>For any usage questions, suggestions and bugs use the <a href="https://github.com/HSE-LAMBDA/roerich/issues">issue page</a>, please.</li>
 </ul>
@@ -177,7 +181,7 @@ roerich.display(X, cps_true, score, cps_pred)
 <h2 id="license">License</h2>
 <pre><code>BSD 2-Clause License
 
-Copyright (c) 2017, ENS Paris-Saclay, CNRS
+Copyright (c) 2020 Laboratory of methods for Big Data Analysis at HSE
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -253,5 +257,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <!--
 MkDocs version : 1.3.0
-Build Date UTC : 2022-07-27 12:11:51.600947+00:00
+Build Date UTC : 2022-07-29 06:24:59.519591+00:00
 -->
