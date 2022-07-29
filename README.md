@@ -24,7 +24,7 @@ or
 ```python
 git clone https://github.com/HSE-LAMBDA/roerich.git
 cd roerich
-python setup.py install
+pip install -e .
 ```
 
 ## Basic usage
