@@ -14,7 +14,7 @@ __all__ = [
     'MatrixUnionPairImportance',
     'MatrixExcludePairImportance',
     'ClassificationNetwork', 
-    'NNClassifier'
+    'NNClassifier',
     'GBDTRuLSIFRegressor', 
     'RegressionNetwork', 
     'NNRuLSIFRegressor'
