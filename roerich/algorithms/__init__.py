@@ -13,7 +13,7 @@ __all__ = [
     'ChangePointDetectionRuLSIF',
     'EnergyDistanceCalculator',
     'ClassificationNetwork', 
-    'NNClassifier'
+    'NNClassifier',
     'GBDTRuLSIFRegressor', 
     'RegressionNetwork', 
     'NNRuLSIFRegressor'
