@@ -17,7 +17,7 @@ __all__ = [
     'ChangePointDetectionClassifierCV', 
     'ChangePointDetectionRuLSIF'
     'ClassificationNetwork', 
-    'NNClassifier'
+    'NNClassifier',
     'GBDTRuLSIFRegressor', 
     'RegressionNetwork', 
     'NNRuLSIFRegressor'
