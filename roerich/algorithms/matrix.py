@@ -55,6 +55,7 @@ def MatrixUnionPairImportance(data, cpd, check=True):
     
     return matrix
 
+# Офоррмтиь в виде класса
 
 def MatrixExcludePairImportance(data, cpd, check=True):
     if type(data) == pd.DataFrame:

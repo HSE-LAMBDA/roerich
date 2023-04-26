@@ -9,7 +9,7 @@ from joblib import Parallel, delayed
 from scipy import interpolate
 from scipy.signal import argrelmax
 
-from .cpdc import *
+from .cpdc import ChangePointDetectionBase
 
 from sklearn.model_selection import StratifiedKFold, KFold
 
@@ -21,7 +21,7 @@ class ChangePointDetectionClassifierCV(ChangePointDetectionBase):
                  periods=1, window_size=100, step=1, n_runs=1, n_splits=5):
 
         """
-        Change point detection algorithm based on binary classififcation.
+        Change point detection algorithm based on binary classififcation with cross validation.
 
         Parameters:
         -----------
@@ -38,7 +38,8 @@ class ChangePointDetectionClassifierCV(ChangePointDetectionBase):
             Algorithm estimates change point detection score for each <step> observation.
         n_runs: int
             Number of times, the binary classifier runs on each pair of test and reference windows.
-        
+        n_splits: int
+            Number of splits for cross validation.
         """
 
         super().__init__(periods, window_size, step, n_runs)
