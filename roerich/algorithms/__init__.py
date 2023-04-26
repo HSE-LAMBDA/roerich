@@ -1,5 +1,6 @@
 from .algorithms import OnlineNNClassifier, OnlineNNRuLSIF
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
+from .cpdc_cv import ChangePointDetectionClassifierCV
 from .models import GBDTRuLSIFRegressor
 from .models import RegressionNetwork, NNRuLSIFRegressor
 from .models import ClassificationNetwork, NNClassifier
@@ -9,10 +10,14 @@ __all__ = [
     'OnlineNNClassifier', 
     'OnlineNNRuLSIF', 
     'ChangePointDetectionClassifier', 
-    'ChangePointDetectionRuLSIF'
+    'ChangePointDetectionClassifierCV', 
+    'ChangePointDetectionRuLSIF',
     'ClassificationNetwork', 
-    'NNClassifier'
+    'NNClassifier',
     'GBDTRuLSIFRegressor', 
     'RegressionNetwork', 
     'NNRuLSIFRegressor'
 ]
+
+
+
