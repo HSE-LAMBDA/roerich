@@ -1,27 +1,14 @@
-from abc import ABCMeta, abstractmethod
-import numpy as np
-import pandas as pd
-from sklearn.metrics import roc_curve, roc_auc_score
-from sklearn.model_selection import train_test_split
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from copy import deepcopy
-from joblib import Parallel, delayed
-from scipy import interpolate
-from scipy.signal import argrelmax
-
 from .cpdc import *
-
 from sklearn.model_selection import StratifiedKFold, KFold
 
-
-# Classification
+# CV Classification
 class ChangePointDetectionClassifierCV(ChangePointDetectionBase):
     
     def __init__(self, base_classifier=QuadraticDiscriminantAnalysis(), metric="KL_sym", 
                  periods=1, window_size=100, step=1, n_runs=1, n_splits=5):
 
         """
-        Change point detection algorithm based on binary classififcation.
+        Change point detection algorithm based on binary classififcation with cross validation.
 
         Parameters:
         -----------
@@ -38,7 +25,8 @@ class ChangePointDetectionClassifierCV(ChangePointDetectionBase):
             Algorithm estimates change point detection score for each <step> observation.
         n_runs: int
             Number of times, the binary classifier runs on each pair of test and reference windows.
-        
+        n_splits: int
+            Number of splits for cross validation
         """
 
         super().__init__(periods, window_size, step, n_runs)
