@@ -1,30 +1,8 @@
-import numpy as np
-import pandas as pd
+from .cpdc import *
 from sklearn.metrics import pairwise_distances
 
-from joblib import Parallel, delayed
-from scipy import interpolate
-from scipy.signal import argrelmax
 
-
-# utils
-def autoregression_matrix(X, periods=1, fill_value=0):
-    shifted_x = [pd.DataFrame(X).shift(periods=i, fill_value=fill_value).values for i in range(periods)]
-    X_auto = np.hstack(tuple(shifted_x))
-    return X_auto
-
-def reference_test(X, window_size=2, step=1):
-    T = []
-    reference = []
-    test = []
-    for i in range(2*window_size-1, len(X), step):
-        T.append(i)
-        reference.append(X[i-2*window_size+1:i-window_size+1])
-        test.append(X[i-window_size+1:i+1])
-    return np.array(T), np.array(reference), np.array(test)
-
-
-class EnergyDistanceCalculator():
+class EnergyDistanceCalculator(ChangePointDetectionBase):
 
     def __init__(self, window_size=100,  periods=1, step=1, n_runs=1):
         """
