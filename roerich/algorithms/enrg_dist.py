@@ -35,4 +35,4 @@ class EnergyDistanceCalculator(ChangePointDetectionBase):
 
         n = X_ref.shape[0]
         E = 2*pairwise_distances(X_ref, X_test, metric='euclidean') - pairwise_distances(X_test, metric='euclidean') - pairwise_distances(X_ref, metric='euclidean')
-        return np.sum(E)/**2
+        return np.sum(E)/n**2
