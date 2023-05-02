@@ -20,7 +20,25 @@ class MatrixScore():
         self.cpd = cpd
 
 
-    def union_score(self, data):
+    def predict(self, data):
+        """
+        Estimate change point detection score for a time series.
+        
+        Parameters:
+        -----------
+        data: numpy.array
+            A broader time-step interval
+
+        Retunrs:
+        --------
+        scores: numpy.array
+            Estimated change point detection score.
+        """
+
+        return self.cpd.predict(data)
+
+
+    def predict_union(self, data):
         """
         Calculates matrixcies of scores by pairwise adding features
         
@@ -76,7 +94,7 @@ class MatrixScore():
         return matrix
 
 
-    def exclude_score(self, data):
+    def predict_exclude(self, data):
         """
         Calculates matrixcies of scores by pairwise deleting features
         
