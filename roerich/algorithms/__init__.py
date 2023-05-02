@@ -1,5 +1,6 @@
 from .algorithms import OnlineNNClassifier, OnlineNNRuLSIF
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
+from .enrg_dist import EnergyDistanceCalculator
 from .cpdc_cv import ChangePointDetectionClassifierCV
 from .models import GBDTRuLSIFRegressor
 from .models import RegressionNetwork, NNRuLSIFRegressor
@@ -10,6 +11,8 @@ __all__ = [
     'OnlineNNClassifier', 
     'OnlineNNRuLSIF', 
     'ChangePointDetectionClassifier', 
+    'ChangePointDetectionRuLSIF',
+    'EnergyDistanceCalculator',
     'ChangePointDetectionClassifierCV', 
     'ChangePointDetectionRuLSIF',
     'ClassificationNetwork', 
