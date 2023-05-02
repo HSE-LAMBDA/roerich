@@ -13,21 +13,32 @@ class MatrixScore():
 
         Parameters:
         -----------
-        T: numpy.array
-            A broader time-step interval
         cpd: roerich.algorithms.ChangePointDetectionClassifier
             Change point detection algorithm 
         """
 
-        # if type(T) == pd.DataFrame:
-        #     T = T.to_numpy()
-
         self.cpd = cpd
 
 
-    def MatrixUnionPairImportance(self, data):
-        assert type(data) == np.ndarray, "'T' argument must be numpy array or pandas dataframe."
-        assert data.shape[1] > 0, "'T' must contain at least 1 feature"
+    def union_score(self, data):
+        """
+        Calculates matrixcies of scores by pairwise adding features
+        
+        Parameters:
+        -----------
+        data: numpy.array
+            A broader time-step interval
+
+        Returns:
+        --------
+        matrix: numpy.array
+            3d array - list of score matricies 
+        """
+
+        if type(data) == pd.DataFrame: data = data.to_numpy()
+
+        assert type(data) == np.ndarray, "'data' argument must be numpy array or pandas dataframe."
+        assert data.shape[1] > 0, "'data' must contain at least 1 feature"
 
         single_FI = {}
         for feature in range(data.shape[1]):
@@ -60,12 +71,30 @@ class MatrixScore():
                 else:
                     matrix[feature_1, feature_2, :] = torch.tensor(single_FI[feature_1])
         
-        return np.swapaxes(matrix.numpy(), 0, 2)
+        matrix = np.swapaxes(matrix.numpy(), 0, 2)
+        
+        return matrix
 
 
-    def MatrixExcludePairImportance(self, data):
-        assert type(data) == np.ndarray, "'T' argument must be numpy array or pandas dataframe."
-        assert data.shape[1] > 0, "'T' must contain at least 1 feature"
+    def exclude_score(self, data):
+        """
+        Calculates matrixcies of scores by pairwise deleting features
+        
+        Parameters:
+        -----------
+        data: numpy.array
+            A broader time-step interval
+
+        Returns:
+        --------
+        matrix: numpy.array
+            3d array - list of score matricies 
+        """
+
+        if type(data) == pd.DataFrame: data = data.to_numpy()
+
+        assert type(data) == np.ndarray, "'data' argument must be numpy array or pandas dataframe."
+        assert data.shape[1] > 0, "'data' must contain at least 1 feature"
 
         single_FI = {}
         for feature in range(data.shape[1]):
@@ -98,6 +127,8 @@ class MatrixScore():
                 else:
                     matrix[feature_1, feature_2, :] = torch.tensor(single_FI[feature_1])
         
-        return np.swapaxes(matrix.numpy(), 0, 2)
+        matrix = np.swapaxes(matrix.numpy(), 0, 2)
+
+        return matrix
 
 
