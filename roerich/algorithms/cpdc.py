@@ -9,6 +9,8 @@ from joblib import Parallel, delayed
 from scipy import interpolate
 from scipy.signal import argrelmax
 
+from roerich.algorithms.models import GBDTRuLSIFRegressor
+
 
 # utils
 def autoregression_matrix(X, periods=1, fill_value=0):
@@ -298,7 +300,8 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
 # NN RuLSIF
 class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
     
-    def __init__(self, base_regressor, metric="PE", periods=1, window_size=100, step=1, n_runs=1):
+    def __init__(self, base_regressor=GBDTRuLSIFRegressor(n_estimators=10),
+                 metric="PE", periods=1, window_size=100, step=1, n_runs=1):
         """
         Change point detection algorithm based on RuLSIF regressor.
 

@@ -16,8 +16,8 @@ from roerich.helper import SMA
 
 
 class ChangePointDetection(metaclass=ABCMeta):
-    def __init__(self, scaler: Any = "default", metric: str = "KL", window_size: int = 1, periods: int = 10,
-                 lag_size: int = 0, step: int = 1, n_epochs: int = 100, lr: float = 0.01, lam: float = 0,
+    def __init__(self, scaler: Any = "default", metric: str = "KL_sym", window_size: int = 10, periods: int = 1,
+                 lag_size: int = 100, step: int = 5, n_epochs: int = 100, lr: float = 0.01, lam: float = 0,
                  optimizer: str = "Adam", debug: int = 0):
         """
         
@@ -241,7 +241,7 @@ class OnlineNNClassifier(ChangePointDetection):
 
 class OnlineNNRuLSIF(ChangePointDetection):
     
-    def __init__(self, alpha, net="default", *args, **kwargs):
+    def __init__(self, alpha=0.1, net="default", *args, **kwargs):
         """
         Parameters
         ----------
