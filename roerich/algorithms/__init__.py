@@ -1,6 +1,6 @@
 from .algorithms import OnlineNNClassifier, OnlineNNRuLSIF
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
-from .matrix import MatrixScore
+from .matrix import MatrixImportance
 from .enrg_dist import EnergyDistanceCalculator
 from .cpdc_cv import ChangePointDetectionClassifierCV
 from .models import GBDTRuLSIFRegressor
@@ -13,7 +13,7 @@ __all__ = [
     'OnlineNNRuLSIF', 
     'ChangePointDetectionClassifier', 
     'ChangePointDetectionRuLSIF',
-    'MatrixScore',
+    'MatrixImportance',
     'EnergyDistanceCalculator',
     'ChangePointDetectionClassifierCV',
     'ClassificationNetwork', 
