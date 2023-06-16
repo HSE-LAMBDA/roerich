@@ -2,67 +2,82 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hse-lambda.github.io/roerich/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/about/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/cpdclassifier/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/cpdclassifier_cv/</loc>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/cpdrulsif/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/energy/</loc>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/gbdtrulsif/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://hse-lambda.github.io/roerich/matrix/</loc>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/nnclassifier/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/nnrulsif/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/onnc/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/onnr/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/pr/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/examples/demo/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/examples/seismic/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://hse-lambda.github.io/roerich/examples/wisdm/</loc>
-         <lastmod>2022-07-29</lastmod>
+         <lastmod>2023-06-16</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

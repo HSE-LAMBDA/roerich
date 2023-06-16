@@ -37,7 +37,7 @@
           <a href=".." class="icon icon-home"> Roerich
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
@@ -53,7 +53,11 @@
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
               <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
+                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier/">ChangePointDetectionClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier_cv/">ChangePointDetectionClassifierCV</a>
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">ChangePointDetectionRuLSIF</a>
     <ul class="current">
@@ -66,6 +70,11 @@
                   <li class="toctree-l1"><a class="reference internal" href="../onnc/">OnlineNNClassifier</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnr/">OnlineNNRuLSIF</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../matrix/">MatrixImportance</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Density ratio</span></p>
@@ -104,16 +113,15 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
-          <li>Detection algorithms &raquo;</li><li>ChangePointDetectionRuLSIF</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Detection algorithms &raquo;</li>
+      <li>ChangePointDetectionRuLSIF</li>
     <li class="wy-breadcrumbs-aside">
-        <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/cpdrulsif.md"
-          class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/cpdrulsif.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
 </div>
-
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
@@ -149,7 +157,7 @@ roerich.display(X, cps_true, score, cps_pred)
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../cpdclassifier/" class="btn btn-neutral float-left" title="ChangePointDetectionClassifier"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../cpdclassifier_cv/" class="btn btn-neutral float-left" title="ChangePointDetectionClassifierCV"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../onnc/" class="btn btn-neutral float-right" title="OnlineNNClassifier">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
@@ -177,7 +185,7 @@ roerich.display(X, cps_true, score, cps_pred)
         </span>
     
     
-      <span><a href="../cpdclassifier/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../cpdclassifier_cv/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../onnc/" style="color: #fcfcfc">Next &raquo;</a></span>

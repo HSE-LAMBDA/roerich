@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/pr/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://hse-lambda.github.io/roerich/energy/" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Precision and Recall - Roerich</title>
+    <title>EnergyDistanceCalculator - Roerich</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
@@ -15,9 +15,9 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Precision and Recall";
-        var mkdocs_page_input_path = "pr.md";
-        var mkdocs_page_url = "/roerich/pr/";
+        var mkdocs_page_name = "EnergyDistanceCalculator";
+        var mkdocs_page_input_path = "energy.md";
+        var mkdocs_page_url = "/roerich/energy/";
       </script>
     
     <script src="../js/jquery-3.6.0.min.js" defer></script>
@@ -52,8 +52,14 @@
                 </li>
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">EnergyDistanceCalculator</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#description">Description</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
@@ -81,16 +87,8 @@
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Quality metrics</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Precision and Recall</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#precision-and-recall_1">Precision and Recall</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pr-curve">PR curve</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
-    </li>
-    </ul>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../pr/">Precision and Recall</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Examples</span></p>
@@ -116,10 +114,10 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-          <li>Quality metrics &raquo;</li>
-      <li>Precision and Recall</li>
+          <li>Detection algorithms &raquo;</li>
+      <li>EnergyDistanceCalculator</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/pr.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/HSE-LAMBDA/roerich/tree/main/docs/energy.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -127,77 +125,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="precision-and-recall">Precision and Recall</h1>
-<h2 id="precision-and-recall_1">Precision and Recall</h2>
-<p>Consider a time series with <script type="math/tex">n</script> change-points at moments <script type="math/tex">\tau_{1}</script>, <script type="math/tex">\tau_{2}</script>, ..., <script type="math/tex">\tau_{n}</script>. Suppose that an algorithm recognises <script type="math/tex">m</script> change points at moments <script type="math/tex">\hat{\tau}_{1}</script>, <script type="math/tex">\hat{\tau}_{2}</script>, ..., <script type="math/tex">\hat{\tau}_{m}</script>. Following [1], a set of correctly detected change-points is defined as True Positive (TP):</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{TP} = \{ \tau_{i} | \exists \hat{\tau}_{j}: |\hat{\tau}_{j} - \tau_{i}| < M \}
-</script>
-</p>
-<p>where <script type="math/tex">M</script> is a margin size, maximum distance allowed between true and predicted change points. Then, Precision and Recall metrics are calculated as follows:</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{Precision} = \frac{|\text{TP}|}{m}
-</script>
-</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{Recall} = \frac{|\text{TP}|}{n}
-</script>
-</p>
-<p>[1] C. Truong, L. Oudre, N. Vayatis. Selective review of offline change point detection methods. Signal Processing, 167:107299, 2020. <a href="https://doi.org/10.1016/j.sigpro.2019.107299">[journal]</a></p>
-<h2 id="pr-curve">PR curve</h2>
-<p>Suppose that we know detection scores <script type="math/tex">s_{1}</script>, <script type="math/tex">s_{2}</script>, ..., <script type="math/tex">s_{m}</script> for all <script type="math/tex">m</script> recognised change points. Let's calculate Precision and Recall metrics for different threshold values <script type="math/tex">\nu</script> for the scores:</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{TP}(\nu) = \{ \tau_{i} | \exists \hat{\tau}_{j}: |\hat{\tau}_{j} - \tau_{i}| < M \text{ and } (s_j \ge \nu) \}
-</script>
-</p>
-<p>
-<script type="math/tex; mode=display">
-    m(\nu) = \sum_{j: s_j \ge \nu} 1
-</script>
-</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{Precision}(\nu) = \frac{|\text{TP}(\nu)|}{m(\nu)}
-</script>
-</p>
-<p>
-<script type="math/tex; mode=display">
-    \text{Recall}(\nu) = \frac{|\text{TP}(\nu)|}{n}
-</script>
-</p>
-<p>PR curve is the dependency of Precision<script type="math/tex">(\nu)</script> form Recall<script type="math/tex">(\nu)</script>.</p>
+                <h1 id="energydistancecalculator">EnergyDistanceCalculator</h1>
+<h2 id="description">Description</h2>
+<p><code>EnergyDistanceCalculator</code> is an offline change point detection algorithm based on energy distance [1]. It scans a signal with a two consecutive windows with some width. The method calculates the energy distance for observations inside these windows, and considers it as a change point detection score for the windows pair.</p>
+<ul>
+<li>[1] Szekely, Gabor. (2003). E-Statistics: The energy of statistical samples. </li>
+</ul>
 <h2 id="usage">Usage</h2>
-<pre><code class="language-python">from roerich.metrics import precision_recall_scores, precision_recall_curve, auc_score
-import matplotlib.pyplot as plt
+<pre><code class="language-python">import roerich
+from roerich.change_point import EnergyDistanceCalculator
 
-cps_true = [100, 200, 300, 400, 500]
-cps_pred = [105, 230, 310, 350, 405, 490]
-cps_score_pred = [1, 2, 3, 0.1, 5, 6]
+# generate time series
+X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
 
-# precision and recall
-precision, recall = precision_recall_scores(cps_true, cps_pred, window=20)
-print('Precision: ', precision)
-print('Recall: ', recall)
-
-# PR curve and AUC
-thr, precision, recall = precision_recall_curve(cps_true, cps_pred, cps_score_pred, window=20)
-auc = auc_score(thr, precision, recall)
-print(&quot;PR AUC: &quot;, auc)
+# change points detection
+cpd = EnergyDistanceCalculator(window_size=100, step=1)
+score, cps_pred = cpd.predict(X)
 
 # visualization
-plt.plot(recall, precision)
-plt.show()
+roerich.display(X, cps_true, score, cps_pred)
 </code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../nnclassifier/" class="btn btn-neutral float-left" title="NNClassifier"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../examples/demo/" class="btn btn-neutral float-right" title="Basics">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../about/" class="btn btn-neutral float-left" title="Change point"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../cpdclassifier/" class="btn btn-neutral float-right" title="ChangePointDetectionClassifier">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -224,10 +177,10 @@ plt.show()
         </span>
     
     
-      <span><a href="../nnclassifier/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../about/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../examples/demo/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../cpdclassifier/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
