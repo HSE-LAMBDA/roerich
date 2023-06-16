@@ -5,7 +5,7 @@ import roerich
 from itertools import combinations
 
 
-class MatrixScore():
+class MatrixImportance():
 
     def __init__(self, cpd):
         """
@@ -40,7 +40,7 @@ class MatrixScore():
 
     def predict_union(self, data):
         """
-        Calculates matrixcies of scores by pairwise adding features
+        Calculates matrices of scores by pairwise adding features
         
         Parameters:
         -----------
@@ -50,7 +50,7 @@ class MatrixScore():
         Returns:
         --------
         matrix: numpy.array
-            3d array - list of score matricies 
+            3d array - list of score matrices
         """
 
         if type(data) == pd.DataFrame: data = data.to_numpy()
@@ -96,7 +96,7 @@ class MatrixScore():
 
     def predict_exclude(self, data):
         """
-        Calculates matrixcies of scores by pairwise deleting features
+        Calculates matrices of scores by pairwise deleting features
         
         Parameters:
         -----------

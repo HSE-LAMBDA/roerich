@@ -27,10 +27,14 @@ nav:
     - Home: 'index.md'
     - Change point: about.md
     - Detection algorithms:
+        - EnergyDistanceCalculator: energy.md
         - ChangePointDetectionClassifier: cpdclassifier.md
+        - ChangePointDetectionClassifierCV: cpdclassifier_cv.md
         - ChangePointDetectionRuLSIF: cpdrulsif.md
         - OnlineNNClassifier: onnc.md
         - OnlineNNRuLSIF: onnr.md
+    - Explanation:
+        - MatrixImportance: matrix.md
     - Density ratio:
         - GBDTRuLSIFRegressor: gbdtrulsif.md
         - NNRuLSIFRegressor: nnrulsif.md
