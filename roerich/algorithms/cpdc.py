@@ -1,13 +1,25 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_curve, roc_auc_score
+from sklearn.metrics import roc_curve, roc_auc_score, log_loss, brier_score_loss
 from sklearn.model_selection import train_test_split
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.preprocessing import StandardScaler
 from copy import deepcopy
 from joblib import Parallel, delayed
 from scipy import interpolate
 from scipy.signal import argrelmax
+
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+
+from sklearn.utils._testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
+
 
 from roerich.algorithms.models import GBDTRuLSIFRegressor
 
@@ -207,15 +219,40 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
 # Classification
 class ChangePointDetectionClassifier(ChangePointDetectionBase):
     
-    def __init__(self, base_classifier=QuadraticDiscriminantAnalysis(), metric="KL_sym", 
+    def __init__(self, base_classifier='mlp', metric="KL_sym",
                  periods=1, window_size=100, step=1, n_runs=1):
         """
-        Change point detection algorithm based on binary classififcation.
+        Change point detection algorithm based on binary classification. It takes to sliding windows (reference and test) in a signal, and separate them using the classifier. The classification quality is considered as a change point detection score.
 
         Parameters:
         -----------
-        base_classifier: object
-            Sklearn-like binary classifier.
+        base_classifier: {'logreg', 'qda', 'dt', 'rf', 'mlp', 'knn', 'nb'} or callable, default='mlp'
+            Sklearn-like binary classifier to separate reference and test sliding windows in the signal.
+
+            - 'logreg', Logistic Regression classifier,
+              sklearn.linear_model.LogisticRegression()
+
+            - 'qda', Quadratic Discriminant Analysis classifier,
+              sklearn.discriminant_analysis.QuadraticDiscriminantAnalysis(store_covariance=True, reg_param=0.01)
+
+            - 'dt', Decision Tree classifier,
+              sklearn.tree.DecisionTreeClassifier(min_samples_leaf=10, max_depth=6)
+
+            - 'rf', Random Forest classifier,
+              sklearn.ensemble.RandomForestClassifier((n_estimators=100, min_samples_leaf=10))
+
+            - 'mlp', Multilayer Perceptron classifier,
+              sklearn.neural_network.MLPClassifier(hidden_layer_sizes=(100,100), solver="adam", activation="relu", learning_rate_init=0.1, max_iter=50, alpha=1.)
+
+            - 'knn', K Neighbors classifier,
+              sklearn.neighbors.KNeighborsClassifier(n_neighbors=10)
+
+            - 'nb', Gaussian Naive Bayes classifier,
+              sklearn.naive_bayes.GaussianNB(var_smoothing=0.01)
+
+            - Callable sklearn-like classifier,
+              base_classifier = LogisticRegression()
+
         metric: string
             Name of the metric, that is used to measure the classifier quality and 
             considered as change point detection score. Default: "KL_sym".
@@ -231,15 +268,34 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         """
 
         super().__init__(periods, window_size, step, n_runs)
-        self.base_classifier = base_classifier
+
+        nsam = min(10, window_size//4+1)
+        if base_classifier == 'qda':
+            self.base_classifier = QuadraticDiscriminantAnalysis(store_covariance=True, reg_param=0.01)
+        elif base_classifier == 'logreg':
+            self.base_classifier = LogisticRegression()
+        elif base_classifier == 'dt':
+            self.base_classifier = DecisionTreeClassifier(min_samples_leaf=nsam, max_depth=6)
+        elif base_classifier == 'rf':
+            self.base_classifier = RandomForestClassifier(n_estimators=100, min_samples_leaf=nsam)
+        elif base_classifier == 'mlp':
+            self.base_classifier = MLPClassifier(hidden_layer_sizes=(100,100), solver="adam", activation="relu",
+                                                 learning_rate_init=0.1, max_iter=50, alpha=1.)
+        elif base_classifier == 'knn':
+            self.base_classifier = KNeighborsClassifier(n_neighbors=nsam)
+        elif base_classifier == 'nb':
+            self.base_classifier = GaussianNB(var_smoothing=0.01)
+        else:
+            self.base_classifier = base_classifier
+
         self.metric = metric
         
 
     def densratio(self, y, alpha=10**-3):
         w = (y + alpha) / (1 - y + alpha)
         return w
-        
-        
+
+    @ignore_warnings(category=ConvergenceWarning)
     def reference_test_predict(self, X_ref, X_test):
         """
         Estimate change point detection score for a pair of test and reference windows.
@@ -267,6 +323,11 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
                                                             stratify=y, 
                                                             random_state=np.random.randint(0, 1000))
         
+        ss = StandardScaler()
+        ss.fit(X_train)
+        X_train = ss.transform(X_train)
+        X_test = ss.transform(X_test)
+
         classifier = deepcopy(self.base_classifier)
         classifier.fit(X_train, y_train)
         y_pred = classifier.predict_proba(X_test)[:, 1]
@@ -289,6 +350,10 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
             score = PE_sym(ref_preds, test_preds)
         elif self.metric == "ROCAUC":
             score = 2 * (roc_auc_score(y_test, y_pred) - 0.5)
+        elif self.metric == "logloss":
+            score = log_loss(y_test, y_pred)
+        elif self.metric == "brier":
+            score = brier_score_loss(y_test, y_pred)
         else:
             score = 0
         
