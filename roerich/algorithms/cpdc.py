@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from copy import deepcopy
 from joblib import Parallel, delayed
 from scipy import interpolate
-from scipy.signal import argrelmax
+from scipy.signal import argrelmax, savgol_filter
 
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
@@ -172,10 +172,12 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
 
         inter = interpolate.interp1d(T_score - self.window_size, score,
                                      kind='linear', fill_value=(0, 0), bounds_error=False)
-        new_score = inter(T)
-        peaks = argrelmax(new_score, order=self.window_size)[0]
+        score_new = inter(T)
+        length = max(min(21, self.window_size//2), 5)
+        score_smooth = savgol_filter(score_new, length, 3)
+        peaks = argrelmax(score_smooth, order=self.window_size)[0]
 
-        return new_score, peaks
+        return score_smooth, peaks
 
     def predict(self, X):
         """
