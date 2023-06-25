@@ -20,6 +20,8 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 
+from roerich.costs import maximum_mean_discrepancy, frechet_distance
+
 
 from roerich.algorithms.models import GBDTRuLSIFRegressor
 
@@ -40,28 +42,12 @@ def reference_test(X, window_size=2, step=1):
         test.append(X[i-window_size+1:i+1])
     return np.array(T), np.array(reference), np.array(test)
 
-def KL_score_unsym(ref_ratios, test_ratios):
-    score = np.mean(np.log(test_ratios))
-    return score
-
-def KL_score(ref_ratios, test_ratios):
-    score = KL_score_unsym(ref_ratios, test_ratios) + KL_score_unsym(1./test_ratios, 1./ref_ratios)
-    return score
-
-def PE_score_unsym(ref_ratios, test_ratios, alpha=0.):
-    score = (-0.5 *       alpha  * np.mean(test_ratios**2)) + \
-            (-0.5 * (1. - alpha) * np.mean(ref_ratios**2))  + np.mean(test_ratios) - 0.5
-    return score
-
-def PE_score(ref_ratios, test_ratios, alpha=0.):
-    score = PE_score_unsym(ref_ratios, test_ratios, alpha)# - PE_score_unsym(test_ratios, ref_ratios, alpha)
-    return score
 
 def KL(ref_preds, test_preds):
     return np.mean(np.log(test_preds + 10**-3)) - np.mean(np.log(1. - test_preds + 10**-3))
 
 def KL_sym(ref_preds, test_preds):
-    return np.mean(np.log(test_preds + 10**-3))     - np.mean(np.log(1. - test_preds + 10**-3)) + \
+    return np.mean(np.log(test_preds + 10**-3)) - np.mean(np.log(1. - test_preds + 10**-3)) + \
            np.mean(np.log(1. - ref_preds + 10**-3)) - np.mean(np.log(ref_preds + 10**-3))
 
 def JSD(ref_preds, test_preds):
@@ -219,10 +205,15 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
 # Classification
 class ChangePointDetectionClassifier(ChangePointDetectionBase):
     
-    def __init__(self, base_classifier='mlp', metric="KL_sym",
+    def __init__(self, base_classifier='mlp', metric="klsym",
                  periods=1, window_size=100, step=1, n_runs=1):
         """
-        Change point detection algorithm based on binary classification. It takes to sliding windows (reference and test) in a signal, and separate them using the classifier. The classification quality is considered as a change point detection score.
+
+        Change point detection algorithm based on binary classification [1]. It takes to sliding windows
+        (reference and test) in a signal, and separate them using the classifier. The classification quality is
+        considered as a change point detection score.
+
+        [1] Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385.
 
         Parameters:
         -----------
@@ -251,20 +242,39 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
               sklearn.naive_bayes.GaussianNB(var_smoothing=0.01)
 
             - Callable sklearn-like classifier,
-              base_classifier = LogisticRegression()
+              Example: base_classifier = LogisticRegression()
 
-        metric: string
-            Name of the metric, that is used to measure the classifier quality and 
-            considered as change point detection score. Default: "KL_sym".
-        periods: int
+        metric: {'klsym', 'pesym', 'jsd', 'mmd', 'fd'} or callable, default='klsym'.
+            Name of a cost function, that is used to measure the classifier quality based on predictions
+            for reference (p_ref) and test (p_test) windows. It is considered as change point detection score.
+
+            - 'klsym' or 'KL_sym', symmetric Kullback-Leibler (KL) divergence,
+            KL(p_test||p_ref) + KL(p_ref||p_test)
+
+            - 'pesym' or 'PE_sym', symmetric Pearson (PE) divergence,
+            PE(p_test||p_ref) + PE(p_ref||p_test)
+
+            - 'jsd' or 'JSD', Jensen–Shannon divergence (JSD),
+            JSD(p_test||p_ref)
+
+            - 'mmd', the Maximum Mean Discrepancy (MMD),
+            MMD(p_test, p_ref)
+
+            - 'fd', the Frechet Distance (FD),
+            FD(p_test, p_ref)
+
+            - Callable function,
+            Example: metric = roerich.costs.frechet_distance
+
+        periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
-        window_size: int
+        window_size: int, default=100
             Number of consecutive observations of a time series in test and reference windows.
-        step: int
+        step: int, default=1
             Algorithm estimates change point detection score for each <step> observation.
-        n_runs: int
+        n_runs: int, default=1
             Number of times, the binary classifier runs on each pair of test and reference windows.
-        
+
         """
 
         super().__init__(periods, window_size, step, n_runs)
@@ -288,12 +298,23 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         else:
             self.base_classifier = base_classifier
 
-        self.metric = metric
-        
+        if metric == "KL" or metric == "kl":
+            self.metric = KL
+        elif metric == "KL_sym" or metric == "klsym":
+            self.metric = KL_sym
+        elif metric == "JSD" or metric == "jsd":
+            self.metric = JSD
+        elif metric == "PE" or metric == "pe":
+            self.metric = PE
+        elif metric == "PE_sym" or metric == "pesym":
+            self.metric = PE_sym
+        elif metric == "mmd":
+            self.metric = maximum_mean_discrepancy
+        elif metric == "fd":
+            self.metric = frechet_distance
+        else:
+            self.metric = metric
 
-    def densratio(self, y, alpha=10**-3):
-        w = (y + alpha) / (1 - y + alpha)
-        return w
 
     @ignore_warnings(category=ConvergenceWarning)
     def reference_test_predict(self, X_ref, X_test):
@@ -313,10 +334,8 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
             Estimated change point detection score for a pair of window.
         """
 
-        y_ref = np.zeros(len(X_ref))
-        y_test = np.ones(len(X_test))
         X = np.vstack((X_ref, X_test))
-        y = np.hstack((y_ref, y_test))
+        y = np.hstack((np.zeros(len(X_ref)), np.ones(len(X_test))))
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, 
                                                             test_size=0.5, 
@@ -331,31 +350,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         classifier = deepcopy(self.base_classifier)
         classifier.fit(X_train, y_train)
         y_pred = classifier.predict_proba(X_test)[:, 1]
-        
-        ref_preds = y_pred[y_test == 0]
-        test_preds = y_pred[y_test == 1]
-        ratios = self.densratio(y_pred)
-        ref_ratios = ratios[y_test == 0]
-        test_ratios = ratios[y_test == 1]
-        
-        if self.metric == "KL":
-            score = KL(ref_preds, test_preds)
-        elif self.metric == "KL_sym":
-            score = KL_sym(ref_preds, test_preds)
-        elif self.metric == "JSD":
-            score = JSD(ref_preds, test_preds)
-        elif self.metric == "PE":
-            score = PE(ref_preds, test_preds)
-        elif self.metric == "PE_sym":
-            score = PE_sym(ref_preds, test_preds)
-        elif self.metric == "ROCAUC":
-            score = 2 * (roc_auc_score(y_test, y_pred) - 0.5)
-        elif self.metric == "logloss":
-            score = log_loss(y_test, y_pred)
-        elif self.metric == "brier":
-            score = brier_score_loss(y_test, y_pred)
-        else:
-            score = 0
+        score = self.metric(y_pred[y_test == 0], y_pred[y_test == 1])
         
         return score
     
