@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_curve, roc_auc_score, log_loss, brier_score_loss
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from copy import deepcopy
@@ -22,7 +21,6 @@ from sklearn.exceptions import ConvergenceWarning
 
 from roerich.costs import maximum_mean_discrepancy, frechet_distance
 
-
 from roerich.algorithms.models import GBDTRuLSIFRegressor
 
 
@@ -32,58 +30,72 @@ def autoregression_matrix(X, periods=1, fill_value=0):
     X_auto = np.hstack(tuple(shifted_x))
     return X_auto
 
+
 def reference_test(X, window_size=2, step=1):
     T = []
     reference = []
     test = []
-    for i in range(2*window_size-1, len(X), step):
+    for i in range(2 * window_size - 1, len(X), step):
         T.append(i)
-        reference.append(X[i-2*window_size+1:i-window_size+1])
-        test.append(X[i-window_size+1:i+1])
+        reference.append(X[i - 2 * window_size + 1:i - window_size + 1])
+        test.append(X[i - window_size + 1:i + 1])
     return np.array(T), np.array(reference), np.array(test)
 
 
 def KL(ref_preds, test_preds):
-    return np.mean(np.log(test_preds + 10**-3)) - np.mean(np.log(1. - test_preds + 10**-3))
+    return np.mean(np.log(test_preds + 10 ** -3)) - np.mean(np.log(1. - test_preds + 10 ** -3))
+
 
 def KL_sym(ref_preds, test_preds):
-    return np.mean(np.log(test_preds + 10**-3)) - np.mean(np.log(1. - test_preds + 10**-3)) + \
-           np.mean(np.log(1. - ref_preds + 10**-3)) - np.mean(np.log(ref_preds + 10**-3))
+    return np.mean(np.log(test_preds + 10 ** -3)) - np.mean(np.log(1. - test_preds + 10 ** -3)) + \
+        np.mean(np.log(1. - ref_preds + 10 ** -3)) - np.mean(np.log(ref_preds + 10 ** -3))
+
 
 def JSD(ref_preds, test_preds):
-    return np.log(2) + 0.5 * np.mean(np.log(test_preds + 10**-3)) + 0.5 * np.mean(np.log(1. - ref_preds + 10**-3))
+    return np.log(2) + 0.5 * np.mean(np.log(test_preds + 10 ** -3)) + 0.5 * np.mean(np.log(1. - ref_preds + 10 ** -3))
+
 
 def PE(ref_preds, test_preds):
-    scores = test_preds / (1. - test_preds + 10**-6) - 1.
+    scores = test_preds / (1. - test_preds + 10 ** -6) - 1.
     scores = np.clip(scores, 0, 1000)
     return np.mean(scores)
 
+
 def PE_sym(ref_preds, test_preds):
-    scores_1 = test_preds / (1. - test_preds + 10**-6) - 1.
+    scores_1 = test_preds / (1. - test_preds + 10 ** -6) - 1.
     scores_1 = np.clip(scores_1, 0, 1000)
-    scores_2 = (1. - ref_preds) / (ref_preds + 10**-6) - 1.
+    scores_2 = (1. - ref_preds) / (ref_preds + 10 ** -6) - 1.
     scores_2 = np.clip(scores_2, 0, 1000)
     return np.mean(scores_1) + np.mean(scores_2)
 
 
-
 # Base
 class ChangePointDetectionBase(metaclass=ABCMeta):
-    
+
     def __init__(self, periods=1, window_size=100, step=1, n_runs=1):
         """
-        Change point detection algorithm based on binary classififcation.
+        Change point detection algorithm based on binary classification.
 
         Parameters:
         -----------
-        periods: int
+        periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
-        window_size: int
-            Number of consecutive observations of a time series in test and reference windows.
-        step: int
-            Algorithm estimates change point detection score for each <step> observation.
-        n_runs: int
-            Number of times, the binary classifier runs on each pair of test and reference windows.
+        The signal is considered as an autoregression process (AR) for classification. In the most cases periods=1
+        will be a good choice.
+
+        window_size: int, default=100
+            Number of consecutive observations of a time series in test and reference
+        windows. Recommendation: select the value so that there is only one change point within 2*window_size
+        observations of the signal.
+
+        step: int, default=1
+            Algorithm estimates change point detection score for each <step> observation. step > 1 helps
+        to speed up the algorithm.
+
+        n_runs: int, default=1
+            Number of times, the binary classifier runs on each pair of test and reference
+        windows. Observations in the windows are divided randomly between train and validation sample every time.
+        n_runs > 1 helps to reduce noise in the change point detection score.
         
         """
 
@@ -91,8 +103,7 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         self.window_size = window_size
         self.step = step
         self.n_runs = n_runs
-        
-        
+
     def reference_test_predict(self, X_ref, X_test):
         """
         Estimate change point detection score for a pair of test and reference windows.
@@ -111,10 +122,9 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         """
 
         score = 0
-        
+
         return score
-    
-    
+
     def reference_test_predict_n_times(self, X_ref, X_test):
         """
         Estimate change point detection score several times for  a pair of test and reference windows.
@@ -136,11 +146,10 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         for i in range(self.n_runs):
             ascore = self.reference_test_predict(X_ref, X_test)
             scores.append(ascore)
-        
+
         return np.mean(scores)
 
-
-    def posprocessing(self, T, T_score, score):
+    def postprocessing(self, T, T_score, score):
         """
         Interpolates and shifts a change point detection score, estimates peak positions.
         
@@ -161,14 +170,13 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
             Positions of peaks in the CPD scores.
         """
 
-        inter = interpolate.interp1d(T_score-self.window_size, score, 
+        inter = interpolate.interp1d(T_score - self.window_size, score,
                                      kind='linear', fill_value=(0, 0), bounds_error=False)
         new_score = inter(T)
         peaks = argrelmax(new_score, order=self.window_size)[0]
 
         return new_score, peaks
-        
-    
+
     def predict(self, X):
         """
         Estimate change point detection score for a time series.
@@ -185,26 +193,25 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         scores: numpy.array
             Estimated change point detection score.
         """
-        
+
+        # data preprocessing
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
         T, reference, test = reference_test(X_auto, window_size=self.window_size, step=1)
-        
-        scores = []
-        T_score = []
+
+        # change point score estimation
         iters = range(0, len(reference), self.step)
         score = Parallel(n_jobs=-1)(delayed(self.reference_test_predict_n_times)(reference[i], test[i]) for i in iters)
         T_score = np.array([T[i] for i in iters])
 
-        new_score, peaks = self.posprocessing(np.arange(len(X)), T_score, score)
-        
+        # cpd score postprocessing
+        new_score, peaks = self.postprocessing(np.arange(len(X)), T_score, score)
+
         return new_score, peaks
 
-    
-    
-    
+
 # Classification
 class ChangePointDetectionClassifier(ChangePointDetectionBase):
-    
+
     def __init__(self, base_classifier='mlp', metric="klsym",
                  periods=1, window_size=100, step=1, n_runs=1):
         """
@@ -245,6 +252,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
               Example: base_classifier = LogisticRegression()
 
         metric: {'klsym', 'pesym', 'jsd', 'mmd', 'fd'} or callable, default='klsym'.
+            {'KL', 'PE'} will be deprecated in future versions.
             Name of a cost function, that is used to measure the classifier quality based on predictions
             for reference (p_ref) and test (p_test) windows. It is considered as change point detection score.
 
@@ -268,18 +276,28 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
 
         periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
+        The signal is considered as an autoregression process (AR) for classification. In the most cases periods=1
+        will be a good choice.
+
         window_size: int, default=100
-            Number of consecutive observations of a time series in test and reference windows.
+            Number of consecutive observations of a time series in test and reference
+        windows. Recommendation: select the value so that there is only one change point within 2*window_size
+        observations of the signal.
+
         step: int, default=1
-            Algorithm estimates change point detection score for each <step> observation.
+            Algorithm estimates change point detection score for each <step> observation. step > 1 helps
+        to speed up the algorithm.
+
         n_runs: int, default=1
-            Number of times, the binary classifier runs on each pair of test and reference windows.
+            Number of times, the binary classifier runs on each pair of test and reference
+        windows. Observations in the windows are divided randomly between train and validation sample every time.
+        n_runs > 1 helps to reduce noise in the change point detection score.
 
         """
 
         super().__init__(periods, window_size, step, n_runs)
 
-        nsam = min(10, window_size//4+1)
+        nsam = min(10, window_size // 4 + 1)
         if base_classifier == 'qda':
             self.base_classifier = QuadraticDiscriminantAnalysis(store_covariance=True, reg_param=0.01)
         elif base_classifier == 'logreg':
@@ -289,7 +307,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         elif base_classifier == 'rf':
             self.base_classifier = RandomForestClassifier(n_estimators=100, min_samples_leaf=nsam)
         elif base_classifier == 'mlp':
-            self.base_classifier = MLPClassifier(hidden_layer_sizes=(100,100), solver="adam", activation="relu",
+            self.base_classifier = MLPClassifier(hidden_layer_sizes=(100, 100), solver="adam", activation="relu",
                                                  learning_rate_init=0.1, max_iter=50, alpha=1.)
         elif base_classifier == 'knn':
             self.base_classifier = KNeighborsClassifier(n_neighbors=nsam)
@@ -315,7 +333,6 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         else:
             self.metric = metric
 
-
     @ignore_warnings(category=ConvergenceWarning)
     def reference_test_predict(self, X_ref, X_test):
         """
@@ -337,11 +354,11 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         X = np.vstack((X_ref, X_test))
         y = np.hstack((np.zeros(len(X_ref)), np.ones(len(X_test))))
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                            test_size=0.5, 
-                                                            stratify=y, 
+        X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                            test_size=0.5,
+                                                            stratify=y,
                                                             random_state=np.random.randint(0, 1000))
-        
+
         ss = StandardScaler()
         ss.fit(X_train)
         X_train = ss.transform(X_train)
@@ -351,15 +368,13 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         classifier.fit(X_train, y_train)
         y_pred = classifier.predict_proba(X_test)[:, 1]
         score = self.metric(y_pred[y_test == 0], y_pred[y_test == 1])
-        
+
         return score
-    
 
 
-       
 # NN RuLSIF
 class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
-    
+
     def __init__(self, base_regressor=GBDTRuLSIFRegressor(n_estimators=10),
                  metric="PE", periods=1, window_size=100, step=1, n_runs=1):
         """
@@ -386,7 +401,6 @@ class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
         super().__init__(periods, window_size, step, n_runs)
         self.base_regressor = base_regressor
         self.metric = metric
-
 
     def one_side_predict(self, X_train, X_test, y_train, y_test):
         """
@@ -415,13 +429,13 @@ class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
         ref_ratios = ratios[y_test == 0]
         test_ratios = ratios[y_test == 1]
         if self.metric == "PE":
-            score = 0.5 * np.mean(test_ratios) - 0.5 # PE_score_unsym(ref_ratios, test_ratios, classifier_1.alpha) - PE_score_unsym(test_ratios, ref_ratios, classifier_1.alpha)
+            score = 0.5 * np.mean(
+                test_ratios) - 0.5  # PE_score_unsym(ref_ratios, test_ratios, classifier_1.alpha) - PE_score_unsym(test_ratios, ref_ratios, classifier_1.alpha)
         else:
             score = 0
 
         return score
-        
-        
+
     def reference_test_predict(self, X_ref, X_test):
         """
         Estimate change point detection score for a pair of test and reference windows.
@@ -444,14 +458,13 @@ class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
         X = np.vstack((X_ref, X_test))
         y = np.hstack((y_ref, y_test))
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, 
-                                                            test_size=0.5, 
-                                                            stratify=y, 
+        X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                            test_size=0.5,
+                                                            stratify=y,
                                                             random_state=np.random.randint(0, 1000))
-        
-        score_right = self.one_side_predict(X_train, X_test, y_train, y_test)
-        score_left = self.one_side_predict(X_train, X_test, 1-y_train, 1-y_test)
-        score = score_right + score_left
-        
-        return score
 
+        score_right = self.one_side_predict(X_train, X_test, y_train, y_test)
+        score_left = self.one_side_predict(X_train, X_test, 1 - y_train, 1 - y_test)
+        score = score_right + score_left
+
+        return score
