@@ -3,7 +3,7 @@ import pytest
 from inspect import getmembers, isfunction, isclass
 from roerich import change_point
 from sklearn.linear_model import LogisticRegression
-from roerich.costs import frechet_distance
+from roerich.scores import frechet_distance
 
 models = [f[1] for f in getmembers(change_point, isclass)]
 

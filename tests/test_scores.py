@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 from inspect import getmembers, isfunction
-from roerich import costs
+from roerich import scores
 
-funcs = [f[1] for f in getmembers(costs, isfunction)]
+funcs = [f[1] for f in getmembers(scores, isfunction)]
 
 
 @pytest.mark.parametrize("cost", funcs)

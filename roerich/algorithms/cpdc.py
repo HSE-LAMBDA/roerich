@@ -19,7 +19,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 
-from roerich.costs import maximum_mean_discrepancy, frechet_distance
+from roerich.scores import maximum_mean_discrepancy, frechet_distance
 
 from roerich.algorithms.models import GBDTRuLSIFRegressor
 
@@ -255,7 +255,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
 
         metric: {'klsym', 'pesym', 'jsd', 'mmd', 'fd'} or callable, default='klsym'.
             {'KL', 'PE'} will be deprecated in future versions.
-            Name of a cost function, that is used to measure the classifier quality based on predictions
+            Name of a score function, that is used to measure the classifier quality based on predictions
             for reference (p_ref) and test (p_test) windows. It is considered as change point detection score.
 
             - 'klsym' or 'KL_sym', symmetric Kullback-Leibler (KL) divergence,
@@ -274,7 +274,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
             FD(p_test, p_ref)
 
             - Callable function,
-            Example: metric = roerich.costs.frechet_distance
+            Example: metric = roerich.scores.frechet_distance
 
         periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
