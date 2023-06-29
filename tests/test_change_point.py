@@ -20,7 +20,8 @@ def test_base(model):
     cp = model()
     score, cps_pred = cp.predict(X)
 
-cpdc = [change_point.ChangePointDetectionClassifier]
+cpdc = [change_point.ChangePointDetectionClassifier,
+        change_point.ChangePointDetectionClassifierCV]
 @pytest.mark.parametrize("model", cpdc)
 def test_base_classifier(model):
     # generate time series
