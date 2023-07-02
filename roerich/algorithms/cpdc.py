@@ -21,7 +21,7 @@ from sklearn.exceptions import ConvergenceWarning
 
 from roerich.scores import maximum_mean_discrepancy, frechet_distance
 
-from roerich.algorithms.models import GBDTRuLSIFRegressor
+from roerich.algorithms.models import GBDTRuLSIFRegressor, NNRuLSIFRegressor
 
 
 # utils
@@ -218,7 +218,7 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
                  periods=1, window_size=100, step=1, n_runs=1):
         """
 
-        Change point detection algorithm based on binary classification [1]. It takes to sliding windows
+        Change point detection algorithm based on binary classification [1]. It takes two sliding windows
         (reference and test) in a signal, and separate them using the classifier. The classification quality is
         considered as a change point detection score.
 
@@ -356,15 +356,13 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
         X = np.vstack((X_ref, X_test))
         y = np.hstack((np.zeros(len(X_ref)), np.ones(len(X_test))))
 
+        ss = StandardScaler()
+        X = ss.fit_transform(X)
+
         X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                             test_size=0.5,
                                                             stratify=y,
                                                             random_state=np.random.randint(0, 1000))
-
-        ss = StandardScaler()
-        ss.fit(X_train)
-        X_train = ss.transform(X_train)
-        X_test = ss.transform(X_test)
 
         classifier = deepcopy(self.base_classifier)
         classifier.fit(X_train, y_train)
@@ -377,34 +375,72 @@ class ChangePointDetectionClassifier(ChangePointDetectionBase):
 # NN RuLSIF
 class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
 
-    def __init__(self, base_regressor=GBDTRuLSIFRegressor(n_estimators=10),
-                 metric="PE", periods=1, window_size=100, step=1, n_runs=1):
+    def __init__(self, base_regressor='mlp', metric="pesym", periods=1, window_size=100, step=1, n_runs=1):
         """
-        Change point detection algorithm based on RuLSIF regressor.
+
+        Change point detection algorithm based on RuLSIF regressor [1]. It takes two sliding windows
+        (reference and test) in a signal, and directly estimates probability density ratio. The ratios are used to 
+        calculate the change point detection score.
+
+        [1] Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385.
 
         Parameters:
         -----------
-        base_regressor: object
-            Sklearn-like regressor with RuLSIF loss function.
-        metric: string
-            Name of the metric, that is used to measure the classifier quality and 
-            considered as change point detection score. Default: "PE".
-        periods: int
+        base_regressor: {'mlp', 'gbdt'} or callable, default='mlp'
+            Sklearn-like regressor with the RuLSIF loss function to estimate the density ratio.
+
+            - 'mlp', Multilayer Perceptron regressor with RuLSIF loss function,
+              roerich.algorithms.models.NNRuLSIFRegressor(n_hidden=100, n_epochs=50, batch_size=2*window_size, lr=0.1, l2=0.01, alpha=0.05)
+            
+            - 'gbdt', Gradient Boosting over Decision Trees regressor with RuLSIF loss function,
+              roerich.algorithms.models.GBDTRuLSIFRegressor(n_estimators=50, learning_rate=0.2, max_depth=3, alpha=0.05, min_samples_leaf=nsam)
+              
+            - Callable object,
+            Example: base_regressor = roerich.algorithms.models.NNRuLSIFRegressor()
+
+        metric: {'pesym'}, default='pesym'.
+            Name of a score function, that is used to calculate the change point detection score based on predictions
+            for reference (p_ref) and test (p_test) windows.
+
+            - 'pesym' or 'PE_sym', Pearson (PE) divergence,
+            PE(p_test||p_ref) + PE(p_ref||p_test)
+
+        periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
-        window_size: int
-            Number of consecutive observations of a time series in test and reference windows.
-        step: int
-            Algorithm estimates change point detection score for each <step> observation.
-        n_runs: int
-            Number of times, the binary classifier runs on each pair of test and reference windows.
-        
+        The signal is considered as an autoregression process (AR) for regression. In the most cases periods=1
+        will be a good choice.
+
+        window_size: int, default=100
+            Number of consecutive observations of a time series in test and reference
+        windows. Recommendation: select the value so that there is only one change point within 2*window_size
+        observations of the signal.
+
+        step: int, default=1
+            Algorithm estimates change point detection score for each <step> observation. step > 1 helps
+        to speed up the algorithm.
+
+        n_runs: int, default=1
+            Number of times, the regressor runs on each pair of test and reference
+        windows. Observations in the windows are divided randomly between train and validation sample every time.
+        n_runs > 1 helps to reduce noise in the change point detection score.
+
         """
 
         super().__init__(periods, window_size, step, n_runs)
-        self.base_regressor = base_regressor
+
+        nsam = min(10, window_size // 4 + 1)
+        if base_regressor == 'gbdt':
+            self.base_regressor = GBDTRuLSIFRegressor(n_estimators=50, learning_rate=0.2,
+                                                      max_depth=3, alpha=0.05, min_samples_leaf=nsam)
+        elif base_regressor == 'mlp':
+            self.base_regressor = NNRuLSIFRegressor(n_hidden=100, n_epochs=50,
+                                                    batch_size=2*window_size, lr=0.1, l2=0.01, alpha=0.05)
+        else:
+            self.base_regressor = base_regressor
+
         self.metric = metric
 
-    def one_side_predict(self, X_train, X_test, y_train, y_test):
+    def _one_side_predict(self, X_train, X_test, y_train, y_test):
         """
         Fit a regressor on a pair of the train sample and make a prediction on the test.
 
@@ -427,12 +463,10 @@ class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
 
         reg = deepcopy(self.base_regressor)
         reg.fit(X_train, y_train)
-        ratios = reg.predict(X_test)
-        ref_ratios = ratios[y_test == 0]
-        test_ratios = ratios[y_test == 1]
-        if self.metric == "PE":
-            score = 0.5 * np.mean(
-                test_ratios) - 0.5  # PE_score_unsym(ref_ratios, test_ratios, classifier_1.alpha) - PE_score_unsym(test_ratios, ref_ratios, classifier_1.alpha)
+        ratios = reg.predict_proba_ratio(X_test)
+
+        if self.metric == "PE" or self.metric == "PE_sym" or self.metric == "pesym":
+            score = 0.5 * np.mean(ratios[y_test == 1]) - 0.5
         else:
             score = 0
 
@@ -460,13 +494,16 @@ class ChangePointDetectionRuLSIF(ChangePointDetectionBase):
         X = np.vstack((X_ref, X_test))
         y = np.hstack((y_ref, y_test))
 
+        ss = StandardScaler()
+        X = ss.fit_transform(X)
+
         X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                             test_size=0.5,
                                                             stratify=y,
                                                             random_state=np.random.randint(0, 1000))
 
-        score_right = self.one_side_predict(X_train, X_test, y_train, y_test)
-        score_left = self.one_side_predict(X_train, X_test, 1 - y_train, 1 - y_test)
+        score_right = self._one_side_predict(X_train, X_test, y_train, y_test)
+        score_left = self._one_side_predict(X_test, X_train, 1 - y_test, 1 - y_train)
         score = score_right + score_left
 
         return score
