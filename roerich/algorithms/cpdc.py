@@ -115,7 +115,7 @@ class ChangePointDetectionBase(metaclass=ABCMeta):
         X_test: numpy.ndarray
             Matrix of test observations.
 
-        Retunrs:
+        Returns:
         --------
         score: float
             Estimated change point detection score for a pair of window.
