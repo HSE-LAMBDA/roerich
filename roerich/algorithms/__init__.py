@@ -1,4 +1,5 @@
-from .algorithms import OnlineNNClassifier, OnlineNNRuLSIF
+from .algorithms import OnlineNNRuLSIF
+from .onnc import OnlineNNClassifier
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
 from .matrix import MatrixImportance
 from .enrg_dist import EnergyDistanceCalculator
