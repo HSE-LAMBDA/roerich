@@ -1,4 +1,5 @@
-from .algorithms import OnlineNNClassifier, OnlineNNRuLSIF
+from ..change_point.onnr import OnlineNNRuLSIF
+from ..change_point.onnc import OnlineNNClassifier
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
 from .matrix import MatrixImportance
 from .enrg_dist import EnergyDistanceCalculator
@@ -9,8 +10,8 @@ from .models import ClassificationNetwork, NNClassifier
 
 
 __all__ = [
-    'OnlineNNClassifier', 
-    'OnlineNNRuLSIF', 
+    'OnlineNNClassifier',
+    'OnlineNNRuLSIF',
     'ChangePointDetectionClassifier', 
     'ChangePointDetectionRuLSIF',
     'MatrixImportance',
