@@ -1,4 +1,4 @@
-from .algorithms import OnlineNNRuLSIF
+from .onnr import OnlineNNRuLSIF
 from .onnc import OnlineNNClassifier
 from .cpdc import ChangePointDetectionClassifier, ChangePointDetectionRuLSIF
 from .matrix import MatrixImportance
