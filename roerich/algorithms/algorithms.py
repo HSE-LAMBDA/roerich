@@ -12,13 +12,21 @@ from roerich.algorithms.net import MyNN, MyNNRegressor
 from roerich.utils import autoregression_matrix, unified_score
 from roerich.metrics.metrics import KL_sym, KL, JSD, PE, PE_sym, Wasserstein
 from roerich.algorithms.scaler import SmaScalerCache
-from roerich.helper import SMA
+#from roerich.helper import SMA
+
+
+def SMA(scores, N):
+    new_scores = []
+    for i in range(0, len(scores)):
+        s = i - N if i - N >= 0 else 0
+        new_scores.append(np.mean(scores[s:i + 1], axis=0))
+    return np.array(new_scores)
 
 
 class ChangePointDetection(metaclass=ABCMeta):
     def __init__(self, scaler: Any = "default", metric: str = "KL_sym", window_size: int = 10, periods: int = 1,
                  lag_size: int = 100, step: int = 5, n_epochs: int = 100, lr: float = 0.01, lam: float = 0,
-                 optimizer: str = "Adam", debug: int = 0):
+                 optimizer: str = "Adam"):
         """
         
         Parameters
@@ -33,10 +41,7 @@ class ChangePointDetection(metaclass=ABCMeta):
         lr: A learning rate at each step of optimizer
         lam: A regularization rate
         optimizer: One of Adam, SGD, RMSprop or ASGD optimizers
-        debug: default zero
         """
-        
-        self.scaler = SmaScalerCache(window_size + lag_size) if scaler == "default" else scaler
         
         self.metric = metric
         self.window_size = window_size
@@ -46,7 +51,6 @@ class ChangePointDetection(metaclass=ABCMeta):
         self.n_epochs = n_epochs
         self.lr = lr
         self.lam = lam
-        self.debug = debug
         
         self._time_shift = lag_size + window_size
         self.avg_window = lag_size + window_size
@@ -93,8 +97,11 @@ class ChangePointDetection(metaclass=ABCMeta):
 
         """
         X_auto = autoregression_matrix(X, periods=self.periods, fill_value=0)
+
         self.init_net(X_auto.shape[1])
+
         T, reference, test = self.reference_test(X_auto)
+
         scores = []
         for i in range(len(reference)):
             X_, y_ = self.preprocess(reference[i], test[i])
@@ -156,8 +163,6 @@ class ChangePointDetection(metaclass=ABCMeta):
         X = np.vstack((X_ref, X_test))
         y = np.hstack((y_ref, y_test))
         
-        X = self.scaler.fit_transform(X)
-        
         X = torch.from_numpy(X).float()
         y = torch.from_numpy(y).float()
         return X, y
@@ -195,7 +200,9 @@ class ChangePointDetection(metaclass=ABCMeta):
 
 
 class OnlineNNClassifier(ChangePointDetection):
-    def __init__(self, net: Union[Type[nn.Module], str] = "default", *args, **kwargs):
+    def __init__(self, net: Union[Type[nn.Module], str] = "default", scaler: Any = "default", metric: str = "KL_sym", window_size: int = 10, periods: int = 1,
+                 lag_size: int = 100, step: int = 5, n_epochs: int = 100, lr: float = 0.01, lam: float = 0,
+                 optimizer: str = "Adam"):
         """
         Parameters
         ----------
@@ -203,7 +210,9 @@ class OnlineNNClassifier(ChangePointDetection):
         args: see parent class
         kwargs: see parent class
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(scaler=scaler, metric=metric, window_size=window_size, periods=periods,
+                 lag_size=lag_size, step=step, n_epochs=n_epochs, lr=lr, lam=lam,
+                 optimizer=optimizer)
         self.criterion = nn.BCELoss()
         
         self.base_net = MyNN if net == "default" else net

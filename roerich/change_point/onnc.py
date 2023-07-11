@@ -1,12 +1,46 @@
 import numpy as np
-from .cpdc import autoregression_matrix
-from scipy.signal import argrelmax, savgol_filter
+import pandas as pd
 from scipy import interpolate
+from scipy.signal import argrelmax, savgol_filter
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+# utils
+def autoregression_matrix(X, periods=1, fill_value=0):
+    shifted_x = [pd.DataFrame(X).shift(periods=i, fill_value=fill_value).values for i in range(periods)]
+    X_auto = np.hstack(tuple(shifted_x))
+    return X_auto
+
+
+def KL(ref_preds, test_preds):
+    return np.mean(np.log(test_preds + 10 ** -3)) - np.mean(np.log(1. - test_preds + 10 ** -3))
+
+
+def KL_sym(ref_preds, test_preds):
+    return np.mean(np.log(test_preds + 10 ** -3)) - np.mean(np.log(1. - test_preds + 10 ** -3)) + \
+        np.mean(np.log(1. - ref_preds + 10 ** -3)) - np.mean(np.log(ref_preds + 10 ** -3))
+
+
+def JSD(ref_preds, test_preds):
+    return np.log(2) + 0.5 * np.mean(np.log(test_preds + 10 ** -3)) + 0.5 * np.mean(np.log(1. - ref_preds + 10 ** -3))
+
+
+def PE(ref_preds, test_preds):
+    scores = test_preds / (1. - test_preds + 10 ** -6) - 1.
+    scores = np.clip(scores, 0, 1000)
+    return np.mean(scores)
+
+
+def PE_sym(ref_preds, test_preds):
+    scores_1 = test_preds / (1. - test_preds + 10 ** -6) - 1.
+    scores_1 = np.clip(scores_1, 0, 1000)
+    scores_2 = (1. - ref_preds) / (ref_preds + 10 ** -6) - 1.
+    scores_2 = np.clip(scores_2, 0, 1000)
+    return np.mean(scores_1) + np.mean(scores_2)
 
 
 def SMA(scores, N):
@@ -23,23 +57,25 @@ class BaseNN(nn.Module):
         self.fc1 = nn.Linear(n_inputs, 100)
         self.act1 = nn.ReLU()
         self.fc2 = nn.Linear(100, 1)
+        self.act2 = nn.Sigmoid()
 
     def forward(self, x):
         x = self.fc1(x)
         x = self.act1(x)
         x = self.fc2(x)
+        x = self.act2(x)
         return x
 
 
-class OnlineNNRuLSIF(object):
+class OnlineNNClassifier(object):
 
-    def __init__(self, net='auto', scaler='auto', alpha=0.1, metric="pesym", window_size=1, lag_size=100, periods=1,
-                 step=1, n_epochs=1, lr=0.1, lam=0., optimizer="RMSprop"):
+    def __init__(self, net='auto', scaler='auto', metric="klsym", window_size=1, lag_size=100, periods=1, step=1,
+                 n_epochs=1, lr=0.1, lam=0., optimizer="RMSprop"):
         """
 
-        Change point detection algorithm using RuLSIF regression based on online neural network [1].
-        It takes two small (1-10) sliding windows (reference and test) in a signal, and directly estimates probability density ratio.
-        The ratios are used to calculate the change point detection score.
+        Change point detection algorithm using binary classification based on online neural network [1].
+        It takes two small (1-10) sliding windows (reference and test) in a signal, and separate them using the classifier,
+        that is trained online. The classification quality is considered as a change point detection score.
 
         [1] Mikhail Hushchyn, Kenenbek Arzymatov and Denis Derkach. “Online Neural Networks for Change-Point Detection.” ArXiv abs/2010.01388 (2020)
 
@@ -49,20 +85,30 @@ class OnlineNNRuLSIF(object):
             PyTorch neural network for binary classification to separate reference and test sliding windows in the signal.
 
             - 'auto', two-layers neural network with 100 neurons in each layer, and ReLU activation.
-              roerich.algorithms.onnr.BaseNN()
+              roerich.algorithms.onnc.BaseNN()
 
-            - Callable, pytorch neural network for regression,
-              Example: base_classifier = roerich.algorithms.onnr.BaseNN
+            - Callable, pytorch neural network for classification,
+              Example: base_classifier = roerich.algorithms.onnc.BaseNN
 
         scaler: {'auto'}, default='auto'
             Ignored. It will be deprecated in future versions.
 
-        metric: {'pesym'} or callable, default='pesym'.
+        metric: {'klsym', 'pesym', 'jsd'} or callable, default='klsym'.
+            {'KL', 'PE'} will be deprecated in future versions.
             Name of a score function, that is used to measure the classifier quality based on predictions
             for reference (p_ref) and test (p_test) windows. It is considered as change point detection score.
 
+            - 'klsym' or 'KL_sym', symmetric Kullback-Leibler (KL) divergence,
+            KL(p_test||p_ref) + KL(p_ref||p_test)
+
             - 'pesym' or 'PE_sym', symmetric Pearson (PE) divergence,
             PE(p_test||p_ref) + PE(p_ref||p_test)
+
+            - 'jsd' or 'JSD', Jensen–Shannon divergence (JSD),
+            JSD(p_test||p_ref)
+
+            - Callable function,
+            Example: metric = roerich.scores.frechet_distance
 
         window_size: int, default=1
             Number of consecutive observations of a time series in test and reference
@@ -100,9 +146,7 @@ class OnlineNNRuLSIF(object):
         else:
             self.base_net = net
 
-        self.net1 = None
-        self.net2 = None
-        self.alpha = alpha
+        self.net = None
         self.metric = metric
         self.window_size = window_size
         self.periods = periods
@@ -113,35 +157,95 @@ class OnlineNNRuLSIF(object):
         self.lam = lam
         self.optimizer = optimizer
 
-    def _init_networks(self, n_inputs):
+        if metric == "KL" or metric == "kl":
+            self.metric = KL
+        elif metric == "KL_sym" or metric == "klsym":
+            self.metric = KL_sym
+        elif metric == "JSD" or metric == "jsd":
+            self.metric = JSD
+        elif metric == "PE" or metric == "pe":
+            self.metric = PE
+        elif metric == "PE_sym" or metric == "pesym":
+            self.metric = PE_sym
+        else:
+            self.metric = KL_sym
+
+    def _init_network(self, n_inputs):
 
         # init network
-        self.net1 = self.base_net(n_inputs)
-        self.net2 = self.base_net(n_inputs)
+        self.net = self.base_net(n_inputs)
 
         # init optimizer
         if self.optimizer == "Adam":
-            self.opt1 = torch.optim.Adam(self.net1.parameters(), lr=self.lr, weight_decay=self.lam)
-            self.opt2 = torch.optim.Adam(self.net2.parameters(), lr=self.lr, weight_decay=self.lam)
+            self.opt = torch.optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.lam)
         elif self.optimizer == "SGD":
-            self.opt1 = torch.optim.SGD(self.net1.parameters(), lr=self.lr, weight_decay=self.lam)
-            self.opt2 = torch.optim.SGD(self.net2.parameters(), lr=self.lr, weight_decay=self.lam)
+            self.opt = torch.optim.SGD(self.net.parameters(), lr=self.lr, weight_decay=self.lam)
         elif self.optimizer == "RMSprop":
-            self.opt1 = torch.optim.RMSprop(self.net1.parameters(), lr=self.lr, weight_decay=self.lam)
-            self.opt2 = torch.optim.RMSprop(self.net2.parameters(), lr=self.lr, weight_decay=self.lam)
+            self.opt = torch.optim.RMSprop(self.net.parameters(), lr=self.lr, weight_decay=self.lam)
         elif self.optimizer == "ASGD":
-            self.opt1 = optim.ASGD(self.net1.parameters(), lr=self.lr, lambd=0.0, alpha=0.75, t0=0.0,
-                                   weight_decay=self.lam)
-            self.opt2 = optim.ASGD(self.net2.parameters(), lr=self.lr, lambd=0.0, alpha=0.75, t0=0.0,
-                                   weight_decay=self.lam)
+            self.opt = optim.ASGD(self.net.parameters(), lr=self.lr, lambd=0.0, alpha=0.75, t0=0.0, weight_decay=self.lam)
         else:
-            self.opt1 = torch.optim.Adam(self.net1.parameters(), lr=self.lr, weight_decay=self.lam)
-            self.opt2 = torch.optim.Adam(self.net2.parameters(), lr=self.lr, weight_decay=self.lam)
+            self.opt = torch.optim.Adam(self.net.parameters(), lr=self.lr, weight_decay=self.lam)
 
-    def _rulsif_loss(self, y_pred_ref, y_pred_test, alpha):
-        loss = 0.5 * (1 - alpha) * (y_pred_ref ** 2).mean() + \
-               0.5 * alpha * (y_pred_test ** 2).mean() - (y_pred_test).mean()
-        return loss
+        # loss function
+        self.criterion = nn.BCELoss()
+
+    def _reference_test(self, X):
+        lag = self.lag_size
+        ws = self.window_size
+        T = []
+        reference = []
+        test = []
+        for i in range(2 * ws + lag - 1, len(X), self.step):
+            T.append(i)
+            reference.append(X[i - 2 * ws - lag + 1:i - ws - lag + 1])
+            test.append(X[i - ws + 1:i + 1])
+        return np.array(T), np.array(reference), np.array(test)
+
+    def _reference_test_predict(self, X_ref, X_test):
+        """
+        Estimate change point detection score for a pair of test and reference windows.
+
+        Parameters:
+        -----------
+        X_ref: numpy.ndarray
+            Matrix of reference observations.
+        X_test: numpy.ndarray
+            Matrix of test observations.
+
+        Retunrs:
+        --------
+        score: float
+            Estimated change point detection score for a pair of window.
+        """
+
+        y_ref = np.zeros(len(X_ref))
+        y_test = np.ones(len(X_test))
+        X = np.vstack((X_ref, X_test))
+        y = np.hstack((y_ref, y_test))
+
+        X = torch.from_numpy(X).float()
+        y = torch.from_numpy(y).float()
+
+        # evaluate
+        self.net.train(False)
+        n_last = min(self.window_size, self.step)
+        ref_preds = self.net(X[y == 0][-n_last:]).detach().numpy()
+        test_preds = self.net(X[y == 1][-n_last:]).detach().numpy()
+
+        # change point detection score
+        score = self.metric(ref_preds, test_preds)
+
+        # update network
+        self.net.train(True)
+        for epoch in range(self.n_epochs):
+            outputs = self.net(X)
+            loss = self.criterion(outputs.squeeze(), y)
+            self.opt.zero_grad()
+            loss.backward()
+            self.opt.step()
+
+        return score
 
     def _postprocessing(self, T, T_score, score):
         """
@@ -208,7 +312,7 @@ class OnlineNNRuLSIF(object):
         T, reference, test = self._reference_test(X_auto)
 
         # init network
-        self._init_networks(X_auto.shape[1])
+        self._init_network(X_auto.shape[1])
 
         # cpd score
         score = [self._reference_test_predict(reference[i], test[i]) for i in range(len(reference))]
@@ -218,58 +322,3 @@ class OnlineNNRuLSIF(object):
         new_score, peaks = self._postprocessing(np.arange(len(X)), T_score, score)
 
         return new_score, peaks
-
-    def _reference_test_predict(self, X_ref, X_test):
-
-        y_ref = np.zeros(len(X_ref))
-        y_test = np.ones(len(X_test))
-        X = np.vstack((X_ref, X_test))
-        y = np.hstack((y_ref, y_test))
-
-        X = torch.from_numpy(X).float()
-        y = torch.from_numpy(y).float()
-
-        n_last = min(self.window_size, self.step)
-        self.net1.train(False)
-        test_preds = self.net1(X[y == 1][-n_last:]).detach().numpy()
-
-        self.net2.train(False)
-        ref_preds = self.net2(X[y == 0][-n_last:]).detach().numpy()
-
-        self.net1.train(True)
-        self.net2.train(True)
-        for epoch in range(self.n_epochs):  # loop over the dataset multiple times
-
-            # forward + backward + optimize
-            y_pred_batch = self.net1(X).squeeze()
-            y_pred_batch_ref = y_pred_batch[y == 0]
-            y_pred_batch_test = y_pred_batch[y == 1]
-            loss = self._rulsif_loss(y_pred_batch_ref, y_pred_batch_test, self.alpha)
-            self.opt1.zero_grad()
-            loss.backward()
-            self.opt1.step()
-
-            # forward + backward + optimize
-            y_pred_batch = self.net2(X).squeeze()
-            y_pred_batch_ref = y_pred_batch[y == 1]
-            y_pred_batch_test = y_pred_batch[y == 0]
-            loss = self._rulsif_loss(y_pred_batch_ref, y_pred_batch_test, self.alpha)
-            self.opt2.zero_grad()
-            loss.backward()
-            self.opt2.step()
-
-        score = (0.5 * np.mean(test_preds) - 0.5) + (0.5 * np.mean(ref_preds) - 0.5)
-
-        return score
-
-    def _reference_test(self, X):
-        N = self.lag_size
-        ws = self.window_size
-        T = []
-        reference = []
-        test = []
-        for i in range(2 * ws + N - 1, len(X), self.step):
-            T.append(i)
-            reference.append(X[i - 2 * ws - N + 1:i - ws - N + 1])
-            test.append(X[i - ws + 1:i + 1])
-        return np.array(T), np.array(reference), np.array(test)
