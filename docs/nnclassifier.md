@@ -16,7 +16,7 @@ The density ratios help to calculate of different dissimilarity scores between t
 ## Usage
 
 ```python
-from roerich.algorithms import NNClassifier
+from roerich.density_ratio import NNClassifier
 from scipy.stats import norm, uniform
 import matplotlib.pyplot as plt
 import numpy as np

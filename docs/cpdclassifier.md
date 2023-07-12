@@ -11,17 +11,32 @@
 
 ```python
 import roerich
-from roerich.algorithms import ChangePointDetectionClassifier
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from roerich.change_point import ChangePointDetectionClassifier
 
 # generate time series
 X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# change points detection
+# base_classifier = 'logreg', 'qda', 'dt', 'rf', 'mlp', 'knn', 'nb'
+# metric = 'klsym', 'pesym', 'jsd', 'mmd', 'fd'
+cpd = ChangePointDetectionClassifier(base_classifier='mlp', metric='klsym', periods=1,
+                                     window_size=100, step=1, n_runs=1)
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
+```
+
+## Usage with custom classifier
+
+```python
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 # sklearn-like binary classifier
 clf = QuadraticDiscriminantAnalysis()
 
 # change points detection
-cpd = ChangePointDetectionClassifier(base_classifier=clf, metric='KL_sym', periods=1,
+cpd = ChangePointDetectionClassifier(base_classifier=clf, metric='klsym', periods=1,
                                      window_size=100, step=1, n_runs=1)
 score, cps_pred = cpd.predict(X)
 
