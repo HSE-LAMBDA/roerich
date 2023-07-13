@@ -26,6 +26,9 @@ class SlidingWindows(ChangePointDetectionBase):
         'mmd' - maximum mean discrepancy
         Otherwise, a function of format like in frechet_distance from roerich.scores.fd
         
+        bootstrap: bool, default=False
+            Whether to use bootstrapping procedure. Resampling is done n_runs times and the average score is returned
+        
         periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
         The signal is considered as an autoregression process (AR) for classification. In the most cases periods=1

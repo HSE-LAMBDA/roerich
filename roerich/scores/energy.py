@@ -6,8 +6,6 @@ def energy_distance(x, y):
     x = np.reshape(x, (len(x), -1))
     y = np.reshape(y, (len(y), -1))
     n = x.shape[0]
-    print(x.shape)
-    print(y.shape)
     a = np.mean(pairwise_distances(x, y, metric='euclidean'))
     b = np.mean(pairwise_distances(y, metric='euclidean'))
     c = np.mean(pairwise_distances(x, metric='euclidean'))
