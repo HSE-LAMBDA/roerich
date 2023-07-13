@@ -1,7 +1,9 @@
-from .cpdc import ChangePointDetectionBase
+from ..algorithms.cpdc import ChangePointDetectionBase
 from roerich.scores.fd import frechet_distance
 from roerich.scores.mmd import maximum_mean_discrepancy
 from roerich.scores.energy import energy_distance
+import numpy as np
+from sklearn.utils import resample
 
 
 class SlidingWindows(ChangePointDetectionBase):
@@ -11,10 +13,18 @@ class SlidingWindows(ChangePointDetectionBase):
         self.metric = metric
 
         """
-        Change point detection algorithm based on binary classification.
+        Sliding windows change point detection method
 
         Parameters:
         -----------
+        
+        metric: str/function, default=None
+            Possible values: {'energy', 'fd', 'mmd'}.
+        'energy' - energy distance
+        'fd' - Frechet distance
+        'mmd' - maximum mean discrepancy
+        Otherwise, a function of format like in frechet_distance from roerich.scores.fd
+        
         periods: int, default=1
             Number of consecutive observations of a time series, considered as one input vector.
         The signal is considered as an autoregression process (AR) for classification. In the most cases periods=1
@@ -33,24 +43,7 @@ class SlidingWindows(ChangePointDetectionBase):
             Number of times, the binary classifier runs on each pair of test and reference
         windows. Observations in the windows are divided randomly between train and validation sample every time.
         n_runs > 1 helps to reduce noise in the change point detection score.
-        
-        metric: str/function, default=None
-            Function that gives the measure of dissimilarity between data points in windows.
-        Metric should be one of: EnergyDist, FrechetDist, MaxMeanDisc; or a function should be passed.
-        Function must be in the following format:
-
-            Parameters:
-            -----------
-            X_ref: numpy.ndarray
-                Matrix of reference observations.
-            X_test: numpy.ndarray
-                Matrix of test observations.
-    
-            Returns:
-            --------
-            score: float
-                Estimated change point detection score for a pair of window.
-
+            
         """
 
     def reference_test_predict(self, X_ref, X_test):
@@ -64,5 +57,31 @@ class SlidingWindows(ChangePointDetectionBase):
         elif callable(self.metric):
             return self.metric(X_ref, X_test)
         else:
-            raise ValueError("metric should be one of: EnergyDist, FrechetDist, MaxMeanDisc; or a function should be "
+            raise ValueError("metric should be one of: energy, fd, mmd; or a function should be "
                              "passed")
+
+    def reference_test_predict_n_times(self, X_ref, X_test):
+        """
+        Estimate change point detection score several times for a pair of test and reference windows
+        where bootstrapping procedure is applied to the test window
+
+        Parameters:
+        -----------
+        X_ref: numpy.ndarray
+            Matrix of reference observations.
+        X_test: numpy.ndarray
+            Matrix of test observations.
+
+        Returns:
+        --------
+        score: float
+            Estimated average change point detection score for a pair of window.
+        """
+
+        scores = []
+        for i in range(self.n_runs):
+            X_test_b = resample(X_test)
+            ascore = self.reference_test_predict(X_ref, X_test_b)
+            scores.append(ascore)
+
+        return np.mean(scores)
