@@ -8,9 +8,10 @@ from sklearn.utils import resample
 
 class SlidingWindows(ChangePointDetectionBase):
 
-    def __init__(self, metric=None, periods=1, window_size=100, step=1, n_runs=1):
+    def __init__(self, metric='mmd', bootstrap=False, periods=1, window_size=100, step=1, n_runs=1):
         super().__init__(periods=periods, window_size=window_size, step=step, n_runs=n_runs)
         self.metric = metric
+        self.bootstrap = bootstrap
 
         """
         Sliding windows change point detection method
@@ -40,9 +41,7 @@ class SlidingWindows(ChangePointDetectionBase):
         to speed up the algorithm.
 
         n_runs: int, default=1
-            Number of times, the binary classifier runs on each pair of test and reference
-        windows. Observations in the windows are divided randomly between train and validation sample every time.
-        n_runs > 1 helps to reduce noise in the change point detection score.
+            Number of times the bootstrapping is applied
             
         """
 
@@ -80,8 +79,11 @@ class SlidingWindows(ChangePointDetectionBase):
 
         scores = []
         for i in range(self.n_runs):
-            X_test_b = resample(X_test)
-            ascore = self.reference_test_predict(X_ref, X_test_b)
+            if self.bootstrap:
+                X_ref_b, X_test_b = resample(X_ref), resample(X_test)
+            else:
+                X_ref_b, X_test_b = X_ref, X_test
+            ascore = self.reference_test_predict(X_ref_b, X_test_b)
             scores.append(ascore)
 
         return np.mean(scores)
