@@ -14,18 +14,13 @@
 
 ```python
 import roerich
-from roerich.algorithms import ChangePointDetectionRuLSIF
-from roerich.algorithms import GBDTRuLSIFRegressor
+from roerich.change_point import ChangePointDetectionRuLSIF
 
 # generate time series
 X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
 
-# RuLSIF regressor
-reg = GBDTRuLSIFRegressor(n_estimators=10)
-
 # change points detection
-cpd = ChangePointDetectionRuLSIF(base_regressor=reg, metric='PE', periods=1,
-                                 window_size=100, step=5, n_runs=1)
+cpd = ChangePointDetectionRuLSIF(periods=1, window_size=100, step=5, n_runs=1)
 score, cps_pred = cpd.predict(X)
 
 # visualization

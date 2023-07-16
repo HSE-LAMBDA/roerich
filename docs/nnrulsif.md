@@ -11,7 +11,7 @@
 ## Usage
 
 ```python
-from roerich.algorithms import NNRuLSIFRegressor
+from roerich.density_ratio import NNRuLSIFRegressor
 from scipy.stats import norm, uniform
 import matplotlib.pyplot as plt
 import numpy as np
