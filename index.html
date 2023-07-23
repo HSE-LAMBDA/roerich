@@ -56,8 +56,6 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#thanks-to-all-our-contributors">Thanks to all our contributors</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
-    </li>
     </ul>
                 </li>
               </ul>
@@ -67,15 +65,17 @@
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="energy/">EnergyDistanceCalculator</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="cpdclassifier_cv/">ChangePointDetectionClassifierCV</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="cpdrulsif/">ChangePointDetectionRuLSIF</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="onnc/">OnlineNNClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="window/">SlidingWindows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="energy/">EnergyDistanceCalculator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="cpdrulsif/">ChangePointDetectionRuLSIF</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="onnr/">OnlineNNRuLSIF</a>
                   </li>
@@ -158,13 +158,15 @@ pip install -e .
 <p>The following code snippet generates a noisy synthetic data, performs change point detection, and displays the results. If you use own dataset, make
 sure that it has a shape <code>(seq_len, n_dims)</code>.</p>
 <pre><code class="language-python">import roerich
-from roerich.algorithms import ChangePointDetectionClassifier
+from roerich.change_point import ChangePointDetectionClassifier
 
 # generate time series
 X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
 
 # detection
-cpd = ChangePointDetectionClassifier()
+# base_classifier = 'logreg', 'qda', 'dt', 'rf', 'mlp', 'knn', 'nb'
+# metric = 'klsym', 'pesym', 'jsd', 'mmd', 'fd'
+cpd = ChangePointDetectionClassifier(base_classifier='mlp', metric='klsym', window_size=100)
 score, cps_pred = cpd.predict(X)
 
 # visualization
@@ -186,33 +188,6 @@ roerich.display(X, cps_true, score, cps_pred)
 <p><a href="https://github.com/HSE-LAMBDA/roerich/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=HSE-LAMBDA/roerich" />
 </a></p>
-<h2 id="license">License</h2>
-<pre><code>BSD 2-Clause License
-
-Copyright (c) 2020 Laboratory of methods for Big Data Analysis at HSE
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-</code></pre>
               
             </div>
           </div><footer>
@@ -265,5 +240,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <!--
 MkDocs version : 1.4.3
-Build Date UTC : 2023-06-16 07:53:55.267746+00:00
+Build Date UTC : 2023-07-23 15:09:03.340460+00:00
 -->

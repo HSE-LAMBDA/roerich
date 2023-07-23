@@ -53,21 +53,25 @@
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
               <ul class="current">
-                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
-                  </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">ChangePointDetectionClassifier</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#description">Description</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage-with-custom-classifier">Usage with custom classifier</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier_cv/">ChangePointDetectionClassifierCV</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnc/">OnlineNNClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../window/">SlidingWindows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnr/">OnlineNNRuLSIF</a>
                   </li>
@@ -133,17 +137,29 @@
 </ul>
 <h2 id="usage">Usage</h2>
 <pre><code class="language-python">import roerich
-from roerich.algorithms import ChangePointDetectionClassifier
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from roerich.change_point import ChangePointDetectionClassifier
 
 # generate time series
 X, cps_true = roerich.generate_dataset(period=200, N_tot=2000)
+
+# change points detection
+# base_classifier = 'logreg', 'qda', 'dt', 'rf', 'mlp', 'knn', 'nb'
+# metric = 'klsym', 'pesym', 'jsd', 'mmd', 'fd'
+cpd = ChangePointDetectionClassifier(base_classifier='mlp', metric='klsym', periods=1,
+                                     window_size=100, step=1, n_runs=1)
+score, cps_pred = cpd.predict(X)
+
+# visualization
+roerich.display(X, cps_true, score, cps_pred)
+</code></pre>
+<h2 id="usage-with-custom-classifier">Usage with custom classifier</h2>
+<pre><code class="language-python">from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 # sklearn-like binary classifier
 clf = QuadraticDiscriminantAnalysis()
 
 # change points detection
-cpd = ChangePointDetectionClassifier(base_classifier=clf, metric='KL_sym', periods=1,
+cpd = ChangePointDetectionClassifier(base_classifier=clf, metric='klsym', periods=1,
                                      window_size=100, step=1, n_runs=1)
 score, cps_pred = cpd.predict(X)
 
@@ -154,7 +170,7 @@ roerich.display(X, cps_true, score, cps_pred)
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../energy/" class="btn btn-neutral float-left" title="EnergyDistanceCalculator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../about/" class="btn btn-neutral float-left" title="Change point"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../cpdclassifier_cv/" class="btn btn-neutral float-right" title="ChangePointDetectionClassifierCV">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
@@ -182,7 +198,7 @@ roerich.display(X, cps_true, score, cps_pred)
         </span>
     
     
-      <span><a href="../energy/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../about/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
       <span><a href="../cpdclassifier_cv/" style="color: #fcfcfc">Next &raquo;</a></span>

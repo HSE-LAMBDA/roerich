@@ -53,15 +53,17 @@
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../cpdclassifier_cv/">ChangePointDetectionClassifierCV</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnc/">OnlineNNClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../window/">SlidingWindows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../energy/">EnergyDistanceCalculator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../cpdrulsif/">ChangePointDetectionRuLSIF</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../onnr/">OnlineNNRuLSIF</a>
                   </li>
@@ -138,7 +140,7 @@ w(x) = \frac{f(x)}{1 - f(x)}
 <li>[1] Mikhail Hushchyn and Andrey Ustyuzhanin. “Generalization of Change-Point Detection in Time Series Data Based on Direct Density Ratio Estimation.” J. Comput. Sci. 53 (2021): 101385. <a href="https://doi.org/10.1016/j.jocs.2021.101385">[journal]</a> <a href="https://doi.org/10.48550/arXiv.2001.06386">[arxiv]</a></li>
 </ul>
 <h2 id="usage">Usage</h2>
-<pre><code class="language-python">from roerich.algorithms import NNClassifier
+<pre><code class="language-python">from roerich.density_ratio import NNClassifier
 from scipy.stats import norm, uniform
 import matplotlib.pyplot as plt
 import numpy as np

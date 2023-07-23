@@ -53,15 +53,17 @@
               </ul>
               <p class="caption"><span class="caption-text">Detection algorithms</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../energy/">EnergyDistanceCalculator</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../cpdclassifier/">ChangePointDetectionClassifier</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../cpdclassifier_cv/">ChangePointDetectionClassifierCV</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../cpdrulsif/">ChangePointDetectionRuLSIF</a>
-                  </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../onnc/">OnlineNNClassifier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../window/">SlidingWindows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../energy/">EnergyDistanceCalculator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../cpdrulsif/">ChangePointDetectionRuLSIF</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../../onnr/">OnlineNNRuLSIF</a>
                   </li>
@@ -438,7 +440,7 @@ roerich.display(X, cps_true, score=None, cps_pred=None)
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Then, we preprocess the time series using <code>StandardScaler</code>. It is not mandatory in general case, but sometimes can be useful :). Besides this, we add some nose to our signal. This hack is a regularization technique that helps to reduce sensitivity of the change point detection methods. It decreases the number of change points within one activity. </p>
+<p>Then, we preprocess the time series using <code>StandardScaler</code>. It is not mandatory in general case, but sometimes can be useful :). Besides this, we add some noise to our signal. This hack is a regularization technique that helps to reduce sensitivity of the change point detection methods. It decreases the number of change points within one activity. </p>
 </div>
 </div>
 </div>
