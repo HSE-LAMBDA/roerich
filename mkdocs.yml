@@ -46,3 +46,4 @@ nav:
       - Basics: examples/demo.ipynb
       - Human activity recognition: examples/wisdm.ipynb
       - Earthquake detection: examples/seismic.ipynb
+      - Benchmarking: examples/benchmarking.ipynb
